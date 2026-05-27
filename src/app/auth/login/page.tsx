@@ -11,12 +11,11 @@ import {
   LogIn,
   Rocket,
   Target,
-  Zap,
   Shield,
   Clock,
 } from "lucide-react";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
-import { FaGoogle, FaGithub } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 
 import loginBg from "@/assets/signup-bg.png";
 import { FcGoogle } from "react-icons/fc";
@@ -29,14 +28,8 @@ export default function LoginPage() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data: Record<string, string> = {};
-
-    formData.forEach((value, key) => {
-      data[key] = value.toString();
-    });
-
-    console.log("Login submitted:", data);
-    alert("Welcome back! Redirecting to dashboard...");
+    const data = Object.fromEntries(formData.entries());
+    console.log(data);
   };
 
   const handleGoogleLogin = () => {
@@ -54,7 +47,7 @@ export default function LoginPage() {
       {/* Glow Effects */}
       <div className="absolute left-0 top-0 h-full w-[35%] bg-[radial-gradient(circle_at_left,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
       <div className="absolute right-0 top-0 h-full w-[35%] bg-[radial-gradient(circle_at_right,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
-      <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
+      <div className="absolute left-1/2 top-1/2 h-150 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-center min-h-[80vh]">
@@ -63,7 +56,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-6xl gap-0">
             
             {/* Left Side - Welcome Container with Background Image */}
-            <div className="relative rounded-l-2xl overflow-hidden min-h-[600px]">
+            <div className="relative rounded-l-2xl overflow-hidden min-h-150">
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
@@ -76,10 +69,10 @@ export default function LoginPage() {
               </div>
               
               {/* Dark Overlay for Text Readability */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#050816]/90 to-[#050816]/70" />
+              <div className="absolute inset-0 bg-linear-to-br from-[#050816]/90 to-[#050816]/70" />
               
               {/* Purple Glow Effect */}
-              <div className="absolute inset-0 bg-gradient-to-t from-violet-600/30 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-t from-violet-600/30 to-transparent pointer-events-none" />
 
               {/* Welcome Content - Shifted to Bottom */}
               <div className="relative z-10 flex flex-col justify-end h-full p-8">
@@ -92,7 +85,7 @@ export default function LoginPage() {
                   <h3 className="text-2xl font-bold leading-tight mb-3">
                     Ready to continue your
                     <br />
-                    <span className="bg-gradient-to-r from-fuchsia-500 to-violet-600 bg-clip-text text-transparent">
+                    <span className="bg-linear-to-r from-fuchsia-500 to-violet-600 bg-clip-text text-transparent">
                       career journey?
                     </span>
                   </h3>
@@ -105,7 +98,7 @@ export default function LoginPage() {
                 {/* Benefits List */}
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
                       <Shield size={14} className="text-violet-400" />
                     </div>
                     <div>
@@ -114,7 +107,7 @@ export default function LoginPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
                       <Target size={14} className="text-violet-400" />
                     </div>
                     <div>
@@ -123,7 +116,7 @@ export default function LoginPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
                       <Clock size={14} className="text-violet-400" />
                     </div>
                     <div>
@@ -155,7 +148,7 @@ export default function LoginPage() {
             <div className="rounded-r-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
               {/* Logo */}
               <div className="flex justify-center mb-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
                   <Briefcase className="h-6 w-6 text-white" />
                 </div>
               </div>
@@ -176,7 +169,7 @@ export default function LoginPage() {
                   name="email"
                   type="email"
                   value={email}
-                  onValueChange={setEmail}
+                  onChange={setEmail}
                   validate={(value) => {
                     if (!value) return "Email is required";
                     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
@@ -198,7 +191,7 @@ export default function LoginPage() {
                   isRequired
                   name="password"
                   value={password}
-                  onValueChange={setPassword}
+                  onChange={setPassword}
                 >
                   <Label className="text-sm text-gray-300">
                     <Lock size={14} className="inline mr-1.5 text-violet-400" />
@@ -236,7 +229,7 @@ export default function LoginPage() {
                 {/* Login Button - Full Width */}
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white font-medium shadow-lg shadow-violet-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                  className="w-full h-12 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 text-white font-medium shadow-lg shadow-violet-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
                 >
                   <LogIn size={16} className="mr-2" />
                   Sign In
@@ -271,7 +264,7 @@ export default function LoginPage() {
 
                 {/* Sign Up Link */}
                 <p className="text-center text-sm text-gray-400 mt-2">
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <Link href="/auth/signup" className="text-violet-400 hover:text-violet-300 font-medium">
                     Create free account
                   </Link>
