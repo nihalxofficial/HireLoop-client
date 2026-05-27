@@ -59,7 +59,7 @@ export default function Footer() {
         
         {/* Top Section with Newsletter - Glass Container */}
         <div className="mb-12 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl md:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-xl font-semibold mb-2">Stay Updated</h3>
               <p className="text-sm text-gray-300">

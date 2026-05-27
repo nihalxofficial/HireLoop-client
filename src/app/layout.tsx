@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Josefin_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 
-const josefin = Josefin_Sans({
+const inter = Inter({
   subsets: ["latin"],
 });
 
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body data-theme="dark" className={` ${josefin.className} dark bg-background text-foreground`}>
+      <body data-theme="dark" className={` ${inter.className} dark bg-background text-foreground`}>
         <Providers>
           <Navbar/>
           {children}
