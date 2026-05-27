@@ -8,6 +8,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - Gravity Icons
 - React Toast
 - React Icons
+- Gravity Icons
+- Lucide React
 
 First, run the development server:
 

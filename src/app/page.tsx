@@ -1,7 +1,7 @@
+// import {ThemeSwitch} from "@/components/shared/ThemeSwitcher"
 export default function Home() {
   return (
     <div>
-      This is home page
     </div>
   );
 }
