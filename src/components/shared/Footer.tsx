@@ -53,7 +53,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="w-full border-t border-white/10 bg-[#0b0b12] text-white mt-20">
+    <footer className="w-full border-t border-white/10 bg-[#050816] text-white mt-20">
       {/* Main Footer Content */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         
@@ -73,7 +73,7 @@ export default function Footer() {
                 placeholder="Enter your email"
                 className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-violet-500 transition"
               />
-              <Button className="bg-white px-6 font-medium text-black hover:bg-gray-200">
+              <Button className="bg-white px-6 font-medium text-black hover:bg-gray-100">
                 Subscribe
               </Button>
             </div>
@@ -90,7 +90,7 @@ export default function Footer() {
               </div>
               <div className="leading-tight">
                 <h1 className="text-sm font-semibold">HireLoop</h1>
-                <p className="text-sm text-gray-300">Find Carrier Opportunities</p>
+                <p className="text-sm text-gray-300">Find Career Opportunities</p>
               </div>
             </Link>
             
