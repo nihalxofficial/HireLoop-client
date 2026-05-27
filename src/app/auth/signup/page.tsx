@@ -3,7 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button, TextField, Label, FieldError, Description, Input, InputGroup } from "@heroui/react";
+import {
+  Button,
+  TextField,
+  Label,
+  FieldError,
+  Description,
+  Input,
+  InputGroup,
+} from "@heroui/react";
 import {
   Mail,
   Lock,
@@ -17,10 +25,11 @@ import {
   Zap,
   TrendingUp,
 } from "lucide-react";
-import {Eye, EyeSlash} from "@gravity-ui/icons";
-
+import { Eye, EyeSlash } from "@gravity-ui/icons";
 
 import signupBg from "@/assets/signup-bg.png";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
 
 export default function SignupPage() {
   const [isVisible, setIsVisible] = useState(false);
@@ -45,10 +54,8 @@ export default function SignupPage() {
 
       <div className="relative mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-center min-h-[80vh]">
-          
           {/* Two Column Layout - No Gap */}
           <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-6xl gap-0">
-            
             {/* Left Side - Welcome Container with Background Image */}
             <div className="relative rounded-l-2xl overflow-hidden min-h-175">
               {/* Background Image */}
@@ -61,10 +68,10 @@ export default function SignupPage() {
                   priority
                 />
               </div>
-              
+
               {/* Dark Overlay for Text Readability */}
               <div className="absolute inset-0 bg-linear-to-br from-[#050816]/90 to-[#050816]/70" />
-              
+
               {/* Purple Glow Effect */}
               <div className="absolute inset-0 bg-linear-to-t from-violet-600/30 to-transparent pointer-events-none" />
 
@@ -74,7 +81,9 @@ export default function SignupPage() {
                 <div className="mb-8">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-4">
                     <Rocket size={12} className="text-violet-400" />
-                    <span className="text-[10px] uppercase tracking-wider">Join 50,000+ job seekers</span>
+                    <span className="text-[10px] uppercase tracking-wider">
+                      Join 50,000+ job seekers
+                    </span>
                   </div>
                   <h3 className="text-2xl font-bold leading-tight mb-3">
                     Your dream career
@@ -84,8 +93,9 @@ export default function SignupPage() {
                     </span>
                   </h3>
                   <p className="text-sm text-gray-300 leading-relaxed">
-                    Create your free account and get access to personalized job matches,
-                    salary insights, and exclusive opportunities from top companies.
+                    Create your free account and get access to personalized job
+                    matches, salary insights, and exclusive opportunities from
+                    top companies.
                   </p>
                 </div>
 
@@ -96,8 +106,12 @@ export default function SignupPage() {
                       <Zap size={14} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">AI-Powered Matching</p>
-                      <p className="text-xs text-gray-400">Get jobs tailored to your skills</p>
+                      <p className="text-sm font-semibold">
+                        AI-Powered Matching
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Get jobs tailored to your skills
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -105,8 +119,12 @@ export default function SignupPage() {
                       <Target size={14} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">Verified Companies</p>
-                      <p className="text-xs text-gray-400">Apply to trusted employers only</p>
+                      <p className="text-sm font-semibold">
+                        Verified Companies
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Apply to trusted employers only
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -115,7 +133,9 @@ export default function SignupPage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold">Career Growth</p>
-                      <p className="text-xs text-gray-400">Resources to advance your career</p>
+                      <p className="text-xs text-gray-400">
+                        Resources to advance your career
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -175,14 +195,19 @@ export default function SignupPage() {
                     type="email"
                     validate={(value) => {
                       if (!value) return "Email is required";
-                      if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+                      if (
+                        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
+                      ) {
                         return "Please enter a valid email address";
                       }
                       return null;
                     }}
                   >
                     <Label className="text-sm text-gray-300">
-                      <Mail size={14} className="inline mr-1.5 text-violet-400" />
+                      <Mail
+                        size={14}
+                        className="inline mr-1.5 text-violet-400"
+                      />
                       Email Address
                     </Label>
                     <Input placeholder="john@example.com" />
@@ -191,7 +216,10 @@ export default function SignupPage() {
 
                   <TextField name="imageUrl">
                     <Label className="text-sm text-gray-300">
-                      <ImageIcon size={14} className="inline mr-1.5 text-violet-400" />
+                      <ImageIcon
+                        size={14}
+                        className="inline mr-1.5 text-violet-400"
+                      />
                       Profile Image URL
                     </Label>
                     <Input placeholder="https://example.com/avatar.jpg" />
@@ -224,7 +252,10 @@ export default function SignupPage() {
                     }}
                   >
                     <Label className="text-sm text-gray-300">
-                      <Lock size={14} className="inline mr-1.5 text-violet-400" />
+                      <Lock
+                        size={14}
+                        className="inline mr-1.5 text-violet-400"
+                      />
                       Password
                     </Label>
                     <InputGroup>
@@ -236,13 +267,19 @@ export default function SignupPage() {
                       <InputGroup.Suffix>
                         <Button
                           isIconOnly
-                          aria-label={isVisible ? "Hide password" : "Show password"}
+                          aria-label={
+                            isVisible ? "Hide password" : "Show password"
+                          }
                           size="sm"
                           variant="ghost"
                           onPress={() => setIsVisible(!isVisible)}
                           className="text-gray-400"
                         >
-                          {isVisible ? <Eye className="size-4" /> : <EyeSlash className="size-4" />}
+                          {isVisible ? (
+                            <Eye className="size-4" />
+                          ) : (
+                            <EyeSlash className="size-4" />
+                          )}
                         </Button>
                       </InputGroup.Suffix>
                     </InputGroup>
@@ -267,7 +304,10 @@ export default function SignupPage() {
                     }}
                   >
                     <Label className="text-sm text-gray-300">
-                      <Lock size={14} className="inline mr-1.5 text-violet-400" />
+                      <Lock
+                        size={14}
+                        className="inline mr-1.5 text-violet-400"
+                      />
                       Verify Password
                     </Label>
                     <InputGroup>
@@ -279,13 +319,19 @@ export default function SignupPage() {
                       <InputGroup.Suffix>
                         <Button
                           isIconOnly
-                          aria-label={isConfirmVisible ? "Hide password" : "Show password"}
+                          aria-label={
+                            isConfirmVisible ? "Hide password" : "Show password"
+                          }
                           size="sm"
                           variant="ghost"
                           onPress={() => setIsConfirmVisible(!isConfirmVisible)}
                           className="text-gray-400"
                         >
-                          {isConfirmVisible ? <Eye className="size-4" /> : <EyeSlash className="size-4" />}
+                          {isConfirmVisible ? (
+                            <Eye className="size-4" />
+                          ) : (
+                            <EyeSlash className="size-4" />
+                          )}
                         </Button>
                       </InputGroup.Suffix>
                     </InputGroup>
@@ -296,7 +342,10 @@ export default function SignupPage() {
                 {/* Role Selection */}
                 <div>
                   <Label className="text-sm text-gray-300 mb-2 block">
-                    <Briefcase size={14} className="inline mr-1.5 text-violet-400" />
+                    <Briefcase
+                      size={14}
+                      className="inline mr-1.5 text-violet-400"
+                    />
                     I am a
                   </Label>
                   <div className="flex gap-3">
@@ -332,11 +381,17 @@ export default function SignupPage() {
                   />
                   <span className="text-xs text-gray-400">
                     I agree to the{" "}
-                    <Link href="/terms" className="text-violet-400 hover:text-violet-300">
+                    <Link
+                      href="/terms"
+                      className="text-violet-400 hover:text-violet-300"
+                    >
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="text-violet-400 hover:text-violet-300">
+                    <Link
+                      href="/privacy"
+                      className="text-violet-400 hover:text-violet-300"
+                    >
                       Privacy Policy
                     </Link>
                   </span>
@@ -353,10 +408,42 @@ export default function SignupPage() {
                   <ArrowRight size={16} className="ml-2" />
                 </Button>
 
+                {/* Divider */}
+                <div className="relative my-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/10"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="px-3 bg-transparent text-gray-500">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex justify-center gap-4">
+                  <button
+                    // onClick={handleGoogleLogin}
+                    className="p-3 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
+                    aria-label="Sign in with Google"
+                  >
+                    <FcGoogle size={20} />
+                  </button>
+                  <button
+                    // onClick={handleGithubLogin}
+                    className="p-3 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
+                    aria-label="Sign in with GitHub"
+                  >
+                    <FaGithub size={20} />
+                  </button>
+                </div>
+
                 {/* Sign In Link */}
                 <p className="text-center text-sm text-gray-400 mt-2">
                   Already have an account?{" "}
-                  <Link href="/signin" className="text-violet-400 hover:text-violet-300 font-medium">
+                  <Link
+                    href="/auth/login"
+                    className="text-violet-400 hover:text-violet-300 font-medium"
+                  >
                     Sign in
                   </Link>
                 </p>
