@@ -10,7 +10,7 @@ export default function CTASection() {
   return (
     <section className="relative overflow-hidden bg-[#050816] text-white">
       {/* Background Image */}
-      <div className="absolute inset-0 mt-20">
+      <div className="absolute inset-0">
         <Image
           src={ctaBg}
           alt="CTA Background"
