@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
 
-import signupBg from "@/assets/signup-bg.png";
+import signupBg from "@/assets/signup.png";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 
@@ -382,14 +382,14 @@ export default function SignupPage() {
                   <span className="text-xs text-gray-400">
                     I agree to the{" "}
                     <Link
-                      href="/terms"
+                      href="/auth/terms"
                       className="text-violet-400 hover:text-violet-300"
                     >
                       Terms of Service
                     </Link>{" "}
                     and{" "}
                     <Link
-                      href="/privacy"
+                      href="/auth/privacy"
                       className="text-violet-400 hover:text-violet-300"
                     >
                       Privacy Policy

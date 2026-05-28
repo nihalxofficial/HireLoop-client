@@ -17,7 +17,7 @@ import {
 import { Eye, EyeSlash } from "@gravity-ui/icons";
 import { FaGithub } from "react-icons/fa";
 
-import loginBg from "@/assets/signup-bg.png";
+import loginBg from "@/assets/login.png";
 import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
