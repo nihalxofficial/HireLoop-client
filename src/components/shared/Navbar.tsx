@@ -1,30 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import { Menu, X } from "lucide-react";
+import { LayoutDashboard, Menu, Settings, X, LogOut, ChevronDown } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { name: "Browse Jobs", href: "#" },
-  { name: "Company", href: "#" },
-  { name: "Pricing", href: "#" },
+  { name: "Browse Jobs", href: "/jobs" },
+  { name: "Company", href: "/company" },
+  { name: "Pricing", href: "/pricing" },
 ];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+
+  const handleProfileClick = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    setIsDropdownOpen(false);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#050816]/80 backdrop-blur-xl text-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30 transition-transform group-hover:scale-105">
             <span className="text-sm font-bold">HL</span>
           </div>
           <div className="leading-tight">
             <h1 className="text-sm font-semibold">HireLoop</h1>
-            <p className="text-xs text-gray-300">Find Career Opportunities</p>
+            <p className="text-xs text-gray-400">Find Career Opportunities</p>
           </div>
         </Link>
 
@@ -36,7 +63,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm text-gray-300 transition hover:text-white"
+                className="text-sm text-gray-300 transition-all duration-300 hover:text-white hover:scale-105"
               >
                 {link.name}
               </Link>
@@ -44,69 +71,230 @@ export default function Navbar() {
           </div>
 
           {/* Divider */}
-          <div className="mx-2 h-5 w-px bg-white/10" />
+          <div className="mx-2 h-5 w-px bg-white/20" />
 
-          {/* Buttons */}
-          <div className="flex items-center gap-1">
-            <Link
-              href="/auth/login"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-violet-400 transition hover:bg-white/5 hover:text-violet-300"
-            >
-              Sign In
-            </Link>
+          {/* Session Loading State */}
+          {isPending ? (
+            <div className="flex items-center gap-3 px-3">
+              <div className="h-8 w-8 rounded-full bg-white/10 animate-pulse" />
+              <div className="h-4 w-20 rounded bg-white/10 animate-pulse" />
+            </div>
+          ) : user ? (
+            // User Dropdown
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={handleProfileClick}
+                className="flex items-center gap-2 px-2 py-1 rounded-xl hover:bg-white/10 transition-all duration-300 cursor-pointer group"
+              >
+                <Image
+                  width={32}
+                  height={32}
+                  src={
+                    user?.image ||
+                    "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=400"
+                  }
+                  alt="avatar"
+                  className="w-8 h-8 rounded-full object-cover ring-2 ring-violet-500/30 group-hover:ring-violet-500/50 transition-all"
+                />
+                <div className="text-left hidden md:block">
+                  <p className="text-sm font-semibold text-white truncate max-w-28">
+                    {user?.name?.split(" ")[0] || user?.name || "User"}
+                  </p>
+                  <p className="text-[10px] text-gray-400">Member</p>
+                </div>
+                <ChevronDown 
+                  size={14} 
+                  className={`text-gray-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
 
-            <Button
-              size="sm"
-              className="bg-white px-4 font-medium text-black hover:bg-gray-100"
-            >
-              <Link href={"/auth/signup"}>Get Started</Link>
-            </Button>
-          </div>
+              {/* Dropdown Menu */}
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 top-12 w-72 rounded-2xl border border-white/10 bg-[#0A0A12]/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden"
+                  >
+                    {/* User Info */}
+                    <div className="px-4 py-4 border-b border-white/10">
+                      <div className="flex items-center gap-3">
+                        <Image
+                          width={48}
+                          height={48}
+                          src={
+                            user?.image ||
+                            "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=400"
+                          }
+                          alt="avatar"
+                          className="w-12 h-12 rounded-full object-cover ring-2 ring-violet-500/30"
+                        />
+                        <div>
+                          <p className="font-semibold text-white">
+                            {user?.name || "User"}
+                          </p>
+                          <p className="text-xs text-gray-400 truncate max-w-48">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-2">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <LayoutDashboard size={16} className="text-violet-400" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/dashboard/settings"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <Settings size={16} className="text-violet-400" />
+                        Settings
+                      </Link>
+                    </div>
+
+                    {/* Sign Out */}
+                    <div className="border-t border-white/10">
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full cursor-pointer flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                      >
+                        <LogOut size={16} />
+                        Sign Out
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            // Auth Buttons for Logged Out Users
+            <div className="flex items-center gap-1">
+              <Link
+                href="/auth/login"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-violet-400 transition-all duration-300 hover:bg-white/10 hover:text-violet-300"
+              >
+                Sign In
+              </Link>
+
+              <Button
+                size="sm"
+                className="bg-white px-4 font-medium text-black hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+              >
+                <Link href="/auth/signup">Get Started</Link>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 lg:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 transition-all duration-300 hover:bg-white/10 lg:hidden"
         >
           {isOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <div className="border-t border-white/10 bg-[#050816]/95 backdrop-blur-xl px-4 py-4 lg:hidden">
-          <div className="flex flex-col gap-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="rounded-lg px-3 py-2.5 text-gray-300 transition hover:bg-white/5 hover:text-white"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="border-t border-white/10 bg-[#050816]/95 backdrop-blur-xl lg:hidden overflow-hidden"
+          >
+            <div className="px-4 py-4">
+              {/* User Info for Mobile */}
+              {user && (
+                <div className="mb-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-3">
+                    <Image
+                      width={40}
+                      height={40}
+                      src={user?.image || "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=400"}
+                      alt="avatar"
+                      className="w-10 h-10 rounded-full object-cover ring-2 ring-violet-500/30"
+                    />
+                    <div>
+                      <p className="font-semibold text-white">{user?.name || "User"}</p>
+                      <p className="text-xs text-gray-400">{user?.email}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-            <div className="mt-2 flex flex-col gap-2">
-              <Link
-                href="/auth/login"
-                className="rounded-lg border border-white/10 px-3 py-2.5 text-center text-violet-400 transition hover:bg-white/5"
-                onClick={() => setIsOpen(false)}
-              >
-                Sign In
-              </Link>
+              <div className="flex flex-col gap-3">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className="rounded-lg px-3 py-2.5 text-gray-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
 
-              <Button 
-                className="w-full bg-white font-medium text-black"
-                onClick={() => setIsOpen(false)}
-              >
-                <Link href={"/auth/signup"}>Get Started</Link>
-              </Button>
+                {user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="rounded-lg px-3 py-2.5 text-gray-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/dashboard/settings"
+                      className="rounded-lg px-3 py-2.5 text-gray-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Settings
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleSignOut();
+                        setIsOpen(false);
+                      }}
+                      className="rounded-lg px-3 py-2.5 text-left text-red-400 transition-all duration-300 hover:bg-red-500/10"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      className="rounded-lg border border-white/10 px-3 py-2.5 text-center text-violet-400 transition-all duration-300 hover:bg-white/10"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Button
+                      className="w-full bg-white font-medium text-black hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Link href="/auth/signup">Get Started</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
