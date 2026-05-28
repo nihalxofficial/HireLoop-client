@@ -25,12 +25,21 @@ export default function Navbar() {
   const router = useRouter();
 
   const handleProfileClick = () => {
+    // Close mobile menu if open
+    if (isOpen) setIsOpen(false);
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleMenuClick = () => {
+    // Close profile dropdown if open
+    if (isDropdownOpen) setIsDropdownOpen(false);
+    setIsOpen(!isOpen);
   };
 
   const handleSignOut = async () => {
     await authClient.signOut();
     setIsDropdownOpen(false);
+    setIsOpen(false);
     router.push("/");
   };
 
@@ -43,6 +52,18 @@ export default function Navbar() {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close mobile menu on window resize (when switching to desktop)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsOpen(false);
+        setIsDropdownOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
@@ -59,7 +80,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Combined Container */}
+        {/* Desktop Combined Container - Hidden on mobile */}
         <div className="hidden items-center rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-xl lg:flex">
           {/* Nav Links */}
           <div className="flex items-center gap-6 px-3">
@@ -84,7 +105,7 @@ export default function Navbar() {
               <div className="h-4 w-20 rounded bg-white/10 animate-pulse" />
             </div>
           ) : user ? (
-            // User Dropdown
+            // User Dropdown - Desktop only
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={handleProfileClick}
@@ -112,7 +133,7 @@ export default function Navbar() {
                 />
               </button>
 
-              {/* Dropdown Menu */}
+              {/* Dropdown Menu - Desktop only */}
               <AnimatePresence>
                 {isDropdownOpen && (
                   <motion.div
@@ -181,7 +202,7 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
           ) : (
-            // Auth Buttons for Logged Out Users
+            // Auth Buttons for Logged Out Users - Desktop only
             <div className="flex items-center gap-1">
               <Link
                 href="/auth/login"
@@ -200,16 +221,132 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Toggle */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 transition-all duration-300 hover:bg-white/10 lg:hidden"
-        >
-          {isOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
+        {/* Mobile Right Side - Profile and Hamburger */}
+        <div className="flex items-center gap-2 lg:hidden">
+          {/* Mobile Profile (only when logged in) */}
+          {!isPending && user && (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={handleProfileClick}
+                className="flex items-center justify-center p-1 rounded-full hover:bg-white/10 transition-all duration-300"
+              >
+                <Image
+                  width={32}
+                  height={32}
+                  src={
+                    user?.image ||
+                    "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=400"
+                  }
+                  alt="avatar"
+                  className="w-8 h-8 rounded-full object-cover ring-2 ring-violet-500/30"
+                />
+              </button>
+
+              {/* Mobile Dropdown Menu */}
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 top-12 w-64 rounded-2xl border border-white/10 bg-[#0A0A12]/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden"
+                  >
+                    {/* User Info */}
+                    <div className="px-4 py-3 border-b border-white/10">
+                      <div className="flex items-center gap-3">
+                        <Image
+                          width={40}
+                          height={40}
+                          src={
+                            user?.image ||
+                            "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=400"
+                          }
+                          alt="avatar"
+                          className="w-10 h-10 rounded-full object-cover ring-2 ring-violet-500/30"
+                        />
+                        <div>
+                          <p className="font-semibold text-white text-sm">
+                            {user?.name || "User"}
+                          </p>
+                          <p className="text-xs text-gray-400 truncate max-w-40">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-2">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          setIsOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <LayoutDashboard size={16} className="text-violet-400" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/dashboard/settings"
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          setIsOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <Settings size={16} className="text-violet-400" />
+                        Settings
+                      </Link>
+                    </div>
+
+                    {/* Sign Out */}
+                    <div className="border-t border-white/10">
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full cursor-pointer flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                      >
+                        <LogOut size={16} />
+                        Sign Out
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Mobile Auth Buttons (when logged out) */}
+          {!isPending && !user && (
+            <div className="flex items-center gap-1">
+              <Link
+                href="/auth/login"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-violet-400 transition-all duration-300 hover:bg-white/10"
+              >
+                Sign In
+              </Link>
+              <Button
+                size="sm"
+                className="bg-white px-3 font-medium text-black hover:bg-gray-100 text-sm"
+              >
+                <Link href="/auth/signup">Sign Up</Link>
+              </Button>
+            </div>
+          )}
+
+          {/* Hamburger Menu Button */}
+          <button
+            onClick={handleMenuClick}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 transition-all duration-300 hover:bg-white/10"
+          >
+            {isOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Full screen slide down */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -217,83 +354,21 @@ export default function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="border-t border-white/10 bg-[#050816]/95 backdrop-blur-xl lg:hidden overflow-hidden"
+            className="lg:hidden overflow-hidden border-t border-white/10 bg-[#050816]/95 backdrop-blur-xl"
           >
             <div className="px-4 py-4">
-              {/* User Info for Mobile */}
-              {user && (
-                <div className="mb-4 p-3 rounded-xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-3">
-                    <Image
-                      width={40}
-                      height={40}
-                      src={user?.image || "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=400"}
-                      alt="avatar"
-                      className="w-10 h-10 rounded-full object-cover ring-2 ring-violet-500/30"
-                    />
-                    <div>
-                      <p className="font-semibold text-white">{user?.name || "User"}</p>
-                      <p className="text-xs text-gray-400">{user?.email}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-3">
+              {/* Mobile Navigation Links */}
+              <div className="flex flex-col gap-2">
                 {navLinks.map((link) => (
                   <Link
                     key={link.name}
                     href={link.href}
-                    className="rounded-lg px-3 py-2.5 text-gray-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
+                    className="rounded-lg px-3 py-3 text-gray-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
                     onClick={() => setIsOpen(false)}
                   >
                     {link.name}
                   </Link>
                 ))}
-
-                {user ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className="rounded-lg px-3 py-2.5 text-gray-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/dashboard/settings"
-                      className="rounded-lg px-3 py-2.5 text-gray-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Settings
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleSignOut();
-                        setIsOpen(false);
-                      }}
-                      className="rounded-lg px-3 py-2.5 text-left text-red-400 transition-all duration-300 hover:bg-red-500/10"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/auth/login"
-                      className="rounded-lg border border-white/10 px-3 py-2.5 text-center text-violet-400 transition-all duration-300 hover:bg-white/10"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                    <Button
-                      className="w-full bg-white font-medium text-black hover:bg-gray-100"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Link href="/auth/signup">Get Started</Link>
-                    </Button>
-                  </>
-                )}
               </div>
             </div>
           </motion.div>
