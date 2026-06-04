@@ -37,14 +37,14 @@ export default function LoginPage() {
 
   const router = useRouter();
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const userData = Object.fromEntries(formData.entries());
 
     const { data, error } = await authClient.signIn.email({
-      email: userData.email as string,
-      password: userData.password as string,
+      email: userData.email,
+      password: userData.password,
     });
     if(data){
       toast.success("Login Successful 🎉")

@@ -43,16 +43,16 @@ export default function SignupPage() {
   
   const router = useRouter();
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const userData = Object.fromEntries(formData.entries());
 
     const { data, error } = await authClient.signUp.email({
-      name: userData.name as string,
-      email: userData.email as string,
-      password: userData.password as string,
-      image: userData.image as string,
+      name: userData.name ,
+      email: userData.email ,
+      password: userData.password ,
+      image: userData.image,
     });
     if(data) {
       toast.success("SignUp Successful 🎉");

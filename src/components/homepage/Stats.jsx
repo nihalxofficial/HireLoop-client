@@ -11,10 +11,10 @@ const Stats = () => {
   return (
     <div className="relative mt-24 flex flex-col items-center">
       {/* Stars */}
-      <div className="absolute top-0 h-[220px] w-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_1px,transparent_1px)] bg-[size:28px_28px] opacity-30" />
+      <div className="absolute top-0 h-55 w-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_1px,transparent_1px)] bg-[size:28px_28px] opacity-30" />
 
       {/* Purple Glow */}
-      <div className="absolute top-8 h-[260px] w-[700px] rounded-full bg-violet-700/40 blur-3xl" />
+      <div className="absolute top-8 h-65 w-175 rounded-full bg-violet-700/40 blur-3xl" />
 
       {/* Globe */}
       <div className="relative z-10 overflow-hidden">
@@ -22,7 +22,7 @@ const Stats = () => {
           src={globe}
           alt="Globe"
           priority
-          className="w-full max-w-[900px] object-contain"
+          className="w-full max-w-225 object-contain"
         />
 
         {/* Text */}
