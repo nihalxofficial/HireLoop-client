@@ -43,39 +43,57 @@ export default function SignupPage() {
   
   const router = useRouter();
 
+  const handleGoogleSignup = () => {
+    console.log("Google signup clicked");
+    toast.info("Google authentication coming soon!");
+  };
+
+  const handleGithubSignup = () => {
+    console.log("GitHub signup clicked");
+    toast.info("GitHub authentication coming soon!");
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const userData = Object.fromEntries(formData.entries());
 
+    // Check if passwords match
+    if (userData.password !== userData.verifyPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
     const { data, error } = await authClient.signUp.email({
       name: userData.name ,
-      email: userData.email ,
-      password: userData.password ,
+      email: userData.email,
+      password: userData.password,
       image: userData.image,
     });
-    if(data) {
+    
+    if (data) {
       toast.success("SignUp Successful 🎉");
       router.push("/");
     }
-    if(error) {
+    if (error) {
       toast.error(error.message);
     }
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#050816] text-white py-20">
+    <section className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
       {/* Glow Effects */}
       <div className="absolute left-0 top-0 h-full w-[35%] bg-[radial-gradient(circle_at_left,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
       <div className="absolute right-0 top-0 h-full w-[35%] bg-[radial-gradient(circle_at_right,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
       <div className="absolute left-1/2 top-1/2 h-150 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
 
-      <div className="relative mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-        <div className="flex items-center justify-center min-h-[80vh]">
-          {/* Two Column Layout - No Gap */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-6xl gap-0">
+      {/* Added pt-20 to account for fixed navbar (h-16 = 64px) */}
+      <div className="relative mx-auto max-w-7xl px-4 md:px-6 lg:px-8 pt-20">
+        <div className="flex items-center justify-center min-h-[calc(100vh-5rem)]">
+          {/* Two Column Layout - No Gap - Smaller width */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl gap-0">
             {/* Left Side - Welcome Container with Background Image */}
-            <div className="relative rounded-l-2xl overflow-hidden min-h-175">
+            <div className="relative rounded-l-2xl overflow-hidden min-h-137.5">
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
@@ -94,23 +112,23 @@ export default function SignupPage() {
               <div className="absolute inset-0 bg-linear-to-t from-violet-600/30 to-transparent pointer-events-none" />
 
               {/* Welcome Content - Shifted to Bottom */}
-              <div className="relative z-10 flex flex-col justify-end h-full p-8">
+              <div className="relative z-10 flex flex-col justify-end h-full p-6">
                 {/* Motivational Quote */}
-                <div className="mb-8">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-4">
+                <div className="mb-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-3">
                     <Rocket size={12} className="text-violet-400" />
                     <span className="text-[10px] uppercase tracking-wider">
                       Join 50,000+ job seekers
                     </span>
                   </div>
-                  <h3 className="text-2xl font-bold leading-tight mb-3">
+                  <h3 className="text-xl font-bold leading-tight mb-2">
                     Your dream career
                     <br />
                     <span className="bg-linear-to-r from-fuchsia-500 to-violet-600 bg-clip-text text-transparent">
                       starts here
                     </span>
                   </h3>
-                  <p className="text-sm text-gray-300 leading-relaxed">
+                  <p className="text-xs text-gray-300 leading-relaxed">
                     Create your free account and get access to personalized job
                     matches, salary insights, and exclusive opportunities from
                     top companies.
@@ -118,40 +136,40 @@ export default function SignupPage() {
                 </div>
 
                 {/* Benefits List */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
-                      <Zap size={14} className="text-violet-400" />
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                      <Zap size={12} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">
+                      <p className="text-xs font-semibold">
                         AI-Powered Matching
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-[10px] text-gray-400">
                         Get jobs tailored to your skills
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
-                      <Target size={14} className="text-violet-400" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                      <Target size={12} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">
+                      <p className="text-xs font-semibold">
                         Verified Companies
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-[10px] text-gray-400">
                         Apply to trusted employers only
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
-                      <TrendingUp size={14} className="text-violet-400" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                      <TrendingUp size={12} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">Career Growth</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs font-semibold">Career Growth</p>
+                      <p className="text-[10px] text-gray-400">
                         Resources to advance your career
                       </p>
                     </div>
@@ -159,54 +177,54 @@ export default function SignupPage() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+                <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/10">
                   <div>
-                    <p className="text-xl font-bold text-violet-400">50K+</p>
-                    <p className="text-xs text-gray-500">Active Jobs</p>
+                    <p className="text-base font-bold text-violet-400">50K+</p>
+                    <p className="text-[10px] text-gray-500">Active Jobs</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold text-violet-400">12K+</p>
-                    <p className="text-xs text-gray-500">Companies</p>
+                    <p className="text-base font-bold text-violet-400">12K+</p>
+                    <p className="text-[10px] text-gray-500">Companies</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold text-violet-400">97%</p>
-                    <p className="text-xs text-gray-500">Success Rate</p>
+                    <p className="text-base font-bold text-violet-400">97%</p>
+                    <p className="text-[10px] text-gray-500">Success Rate</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Side - Signup Form */}
-            <div className="rounded-r-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+            {/* Right Side - Signup Form - Smaller padding */}
+            <div className="rounded-r-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
               {/* Logo */}
-              <div className="flex justify-center mb-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
-                  <Briefcase className="h-6 w-6 text-white" />
+              <div className="flex justify-center mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
+                  <Briefcase className="h-5 w-5 text-white" />
                 </div>
               </div>
 
               {/* Header */}
-              <div className="text-center mb-6">
-                <h1 className="text-2xl font-semibold">Create an account</h1>
-                <p className="text-sm text-gray-400 mt-2">
+              <div className="text-center mb-5">
+                <h1 className="text-xl font-semibold">Create an account</h1>
+                <p className="text-xs text-gray-400 mt-1">
                   Start your journey to find the perfect job
                 </p>
               </div>
 
-              {/* Form */}
-              <form onSubmit={onSubmit} className="flex w-full flex-col gap-4">
+              {/* Form - Smaller gaps */}
+              <form onSubmit={onSubmit} className="flex w-full flex-col gap-3">
                 {/* Full Name */}
                 <TextField isRequired name="name">
-                  <Label className="text-sm text-gray-300">
-                    <User size={14} className="inline mr-1.5 text-violet-400" />
+                  <Label className="text-xs text-gray-300">
+                    <User size={12} className="inline mr-1.5 text-violet-400" />
                     Full Name
                   </Label>
-                  <Input placeholder="John Doe" />
+                  <Input placeholder="John Doe" size="sm" />
                   <FieldError />
                 </TextField>
 
                 {/* Email and Image URL - Side by Side */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   <TextField
                     isRequired
                     name="email"
@@ -221,34 +239,34 @@ export default function SignupPage() {
                       return null;
                     }}
                   >
-                    <Label className="text-sm text-gray-300">
+                    <Label className="text-xs text-gray-300">
                       <Mail
-                        size={14}
+                        size={12}
                         className="inline mr-1.5 text-violet-400"
                       />
                       Email Address
                     </Label>
-                    <Input placeholder="john@example.com" />
+                    <Input placeholder="john@example.com" size="sm" />
                     <FieldError />
                   </TextField>
 
                   <TextField name="image">
-                    <Label className="text-sm text-gray-300">
+                    <Label className="text-xs text-gray-300">
                       <ImageIcon
-                        size={14}
+                        size={12}
                         className="inline mr-1.5 text-violet-400"
                       />
                       Profile Image URL
                     </Label>
-                    <Input placeholder="https://example.com/avatar.jpg" />
-                    <Description className="text-xs text-gray-500">
+                    <Input placeholder="https://example.com/avatar.jpg" size="sm" />
+                    <Description className="text-[10px] text-gray-500">
                       Optional
                     </Description>
                   </TextField>
                 </div>
 
                 {/* Password and Verify Password - Side by Side with InputGroup */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {/* Password Field */}
                   <TextField
                     isRequired
@@ -269,9 +287,9 @@ export default function SignupPage() {
                       return null;
                     }}
                   >
-                    <Label className="text-sm text-gray-300">
+                    <Label className="text-xs text-gray-300">
                       <Lock
-                        size={14}
+                        size={12}
                         className="inline mr-1.5 text-violet-400"
                       />
                       Password
@@ -281,6 +299,7 @@ export default function SignupPage() {
                         type={isVisible ? "text" : "password"}
                         placeholder="Create a password"
                         className="w-full"
+                        size="sm"
                       />
                       <InputGroup.Suffix>
                         <Button
@@ -294,14 +313,14 @@ export default function SignupPage() {
                           className="text-gray-400"
                         >
                           {isVisible ? (
-                            <Eye className="size-4" />
+                            <Eye className="size-3.5" />
                           ) : (
-                            <EyeSlash className="size-4" />
+                            <EyeSlash className="size-3.5" />
                           )}
                         </Button>
                       </InputGroup.Suffix>
                     </InputGroup>
-                    <Description className="text-xs text-gray-500">
+                    <Description className="text-[10px] text-gray-500">
                       Min 8 chars, 1 uppercase, 1 number
                     </Description>
                     <FieldError />
@@ -321,9 +340,9 @@ export default function SignupPage() {
                       return null;
                     }}
                   >
-                    <Label className="text-sm text-gray-300">
+                    <Label className="text-xs text-gray-300">
                       <Lock
-                        size={14}
+                        size={12}
                         className="inline mr-1.5 text-violet-400"
                       />
                       Verify Password
@@ -333,6 +352,7 @@ export default function SignupPage() {
                         type={isConfirmVisible ? "text" : "password"}
                         placeholder="Confirm your password"
                         className="w-full"
+                        size="sm"
                       />
                       <InputGroup.Suffix>
                         <Button
@@ -346,9 +366,9 @@ export default function SignupPage() {
                           className="text-gray-400"
                         >
                           {isConfirmVisible ? (
-                            <Eye className="size-4" />
+                            <Eye className="size-3.5" />
                           ) : (
-                            <EyeSlash className="size-4" />
+                            <EyeSlash className="size-3.5" />
                           )}
                         </Button>
                       </InputGroup.Suffix>
@@ -359,32 +379,32 @@ export default function SignupPage() {
 
                 {/* Role Selection */}
                 <div>
-                  <Label className="text-sm text-gray-300 mb-2 block">
+                  <Label className="text-xs text-gray-300 mb-1.5 block">
                     <Briefcase
-                      size={14}
+                      size={12}
                       className="inline mr-1.5 text-violet-400"
                     />
                     I am a
                   </Label>
-                  <div className="flex gap-3">
-                    <label className="flex-1 flex items-center gap-2 p-3 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition hover:bg-white/10">
+                  <div className="flex gap-2">
+                    <label className="flex-1 flex items-center gap-2 p-2 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition hover:bg-white/10">
                       <input
                         type="radio"
                         name="role"
                         value="jobseeker"
                         defaultChecked
-                        className="w-4 h-4 text-violet-500"
+                        className="w-3.5 h-3.5 text-violet-500"
                       />
-                      <span className="text-sm">Job Seeker</span>
+                      <span className="text-xs">Job Seeker</span>
                     </label>
-                    <label className="flex-1 flex items-center gap-2 p-3 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition hover:bg-white/10">
+                    <label className="flex-1 flex items-center gap-2 p-2 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition hover:bg-white/10">
                       <input
                         type="radio"
                         name="role"
                         value="recruiter"
-                        className="w-4 h-4 text-violet-500"
+                        className="w-3.5 h-3.5 text-violet-500"
                       />
-                      <span className="text-sm">Recruiter</span>
+                      <span className="text-xs">Recruiter</span>
                     </label>
                   </div>
                 </div>
@@ -395,9 +415,9 @@ export default function SignupPage() {
                     type="checkbox"
                     checked={agreeTerms}
                     onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="w-4 h-4 cursor-pointer rounded border-white/10 bg-white/5 text-violet-500 focus:ring-violet-500"
+                    className="w-3.5 h-3.5 cursor-pointer rounded border-white/10 bg-white/5 text-violet-500 focus:ring-violet-500"
                   />
-                  <span className="text-xs text-gray-400">
+                  <span className="text-[10px] text-gray-400">
                     I agree to the{" "}
                     <Link
                       href="/auth/terms"
@@ -418,45 +438,45 @@ export default function SignupPage() {
                 {/* Create Account Button - Full Width */}
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 text-white font-medium shadow-lg shadow-violet-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                  className="w-full h-10 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 text-white font-medium shadow-lg shadow-violet-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl text-sm"
                   isDisabled={!agreeTerms}
                 >
-                  <Sparkles size={16} className="mr-2" />
+                  <Sparkles size={14} className="mr-2" />
                   Create Free Account
-                  <ArrowRight size={16} className="ml-2" />
+                  <ArrowRight size={14} className="ml-2" />
                 </Button>
 
                 {/* Divider */}
-                <div className="relative my-2">
+                <div className="relative my-1">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-white/10"></div>
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="px-3 bg-transparent text-gray-500">
+                    <span className="px-2 bg-transparent text-gray-500 text-[10px]">
                       Or continue with
                     </span>
                   </div>
                 </div>
 
-                <div className="flex justify-center gap-4">
+                <div className="flex justify-center gap-3">
                   <button
-                    // onClick={handleGoogleLogin}
-                    className="p-3 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
-                    aria-label="Sign in with Google"
+                    onClick={handleGoogleSignup}
+                    className="p-2 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
+                    aria-label="Sign up with Google"
                   >
-                    <FcGoogle size={20} />
+                    <FcGoogle size={18} />
                   </button>
                   <button
-                    // onClick={handleGithubLogin}
-                    className="p-3 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
-                    aria-label="Sign in with GitHub"
+                    onClick={handleGithubSignup}
+                    className="p-2 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
+                    aria-label="Sign up with GitHub"
                   >
-                    <FaGithub size={20} />
+                    <FaGithub size={18} />
                   </button>
                 </div>
 
                 {/* Sign In Link */}
-                <p className="text-center text-sm text-gray-400 mt-2">
+                <p className="text-center text-xs text-gray-400 mt-1">
                   Already have an account?{" "}
                   <Link
                     href="/auth/login"

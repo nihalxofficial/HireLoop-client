@@ -66,18 +66,19 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#050816] text-white py-20">
+    <section className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
       {/* Glow Effects */}
       <div className="absolute left-0 top-0 h-full w-[35%] bg-[radial-gradient(circle_at_left,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
       <div className="absolute right-0 top-0 h-full w-[35%] bg-[radial-gradient(circle_at_right,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
       <div className="absolute left-1/2 top-1/2 h-150 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
 
-      <div className="relative mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-        <div className="flex items-center justify-center min-h-[80vh]">
-          {/* Two Column Layout - No Gap */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-6xl gap-0">
+      {/* Added pt-20 to account for fixed navbar (h-16 = 64px) */}
+      <div className="relative mx-auto max-w-7xl px-4 md:px-6 lg:px-8 pt-20 ">
+        <div className="flex items-center justify-center min-h-[calc(100vh-5rem)]">
+          {/* Two Column Layout - No Gap - Smaller width */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-5xl gap-0">
             {/* Left Side - Welcome Container with Background Image */}
-            <div className="relative rounded-l-2xl overflow-hidden min-h-150">
+            <div className="relative rounded-l-2xl overflow-hidden min-h-137.5">
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
@@ -96,61 +97,61 @@ export default function LoginPage() {
               <div className="absolute inset-0 bg-linear-to-t from-violet-600/30 to-transparent pointer-events-none" />
 
               {/* Welcome Content - Shifted to Bottom */}
-              <div className="relative z-10 flex flex-col justify-end h-full p-8">
+              <div className="relative z-10 flex flex-col justify-end h-full p-6">
                 {/* Welcome Badge */}
-                <div className="mb-8">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-4">
+                <div className="mb-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-3">
                     <Rocket size={12} className="text-violet-400" />
                     <span className="text-[10px] uppercase tracking-wider">
                       Welcome Back!
                     </span>
                   </div>
-                  <h3 className="text-2xl font-bold leading-tight mb-3">
+                  <h3 className="text-xl font-bold leading-tight mb-2">
                     Ready to continue your
                     <br />
                     <span className="bg-linear-to-r from-fuchsia-500 to-violet-600 bg-clip-text text-transparent">
                       career journey?
                     </span>
                   </h3>
-                  <p className="text-sm text-gray-300 leading-relaxed">
+                  <p className="text-xs text-gray-300 leading-relaxed">
                     Sign in to access your personalized job matches, track
                     applications, and connect with top employers.
                   </p>
                 </div>
 
                 {/* Benefits List */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
-                      <Shield size={14} className="text-violet-400" />
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                      <Shield size={12} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">Secure Access</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs font-semibold">Secure Access</p>
+                      <p className="text-[10px] text-gray-400">
                         Your data is always protected
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
-                      <Target size={14} className="text-violet-400" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                      <Target size={12} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">
+                      <p className="text-xs font-semibold">
                         Personalized Matches
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-[10px] text-gray-400">
                         Jobs tailored to your profile
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
-                      <Clock size={14} className="text-violet-400" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500/20 to-violet-600/20 border border-white/10">
+                      <Clock size={12} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">Quick Apply</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs font-semibold">Quick Apply</p>
+                      <p className="text-[10px] text-gray-400">
                         Apply to jobs in one click
                       </p>
                     </div>
@@ -158,42 +159,42 @@ export default function LoginPage() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+                <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/10">
                   <div>
-                    <p className="text-xl font-bold text-violet-400">50K+</p>
-                    <p className="text-xs text-gray-500">Active Jobs</p>
+                    <p className="text-base font-bold text-violet-400">50K+</p>
+                    <p className="text-[10px] text-gray-500">Active Jobs</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold text-violet-400">12K+</p>
-                    <p className="text-xs text-gray-500">Companies</p>
+                    <p className="text-base font-bold text-violet-400">12K+</p>
+                    <p className="text-[10px] text-gray-500">Companies</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold text-violet-400">97%</p>
-                    <p className="text-xs text-gray-500">Success Rate</p>
+                    <p className="text-base font-bold text-violet-400">97%</p>
+                    <p className="text-[10px] text-gray-500">Success Rate</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Side - Login Form */}
-            <div className="rounded-r-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+            {/* Right Side - Login Form - Smaller padding */}
+            <div className="rounded-r-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
               {/* Logo */}
-              <div className="flex justify-center mb-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
-                  <Briefcase className="h-6 w-6 text-white" />
+              <div className="flex justify-center mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
+                  <Briefcase className="h-5 w-5 text-white" />
                 </div>
               </div>
 
               {/* Header */}
-              <div className="text-center mb-6">
-                <h1 className="text-2xl font-semibold">Welcome back</h1>
-                <p className="text-sm text-gray-400 mt-2">
+              <div className="text-center mb-5">
+                <h1 className="text-xl font-semibold">Welcome back</h1>
+                <p className="text-xs text-gray-400 mt-1">
                   Sign in to continue your job search
                 </p>
               </div>
 
-              {/* Form */}
-              <form onSubmit={onSubmit} className="flex w-full flex-col gap-5">
+              {/* Form - Smaller gaps */}
+              <form onSubmit={onSubmit} className="flex w-full flex-col gap-4">
                 {/* Email Field */}
                 <TextField
                   isRequired
@@ -211,11 +212,11 @@ export default function LoginPage() {
                     return null;
                   }}
                 >
-                  <Label className="text-sm text-gray-300">
-                    <Mail size={14} className="inline mr-1.5 text-violet-400" />
+                  <Label className="text-xs text-gray-300">
+                    <Mail size={12} className="inline mr-1.5 text-violet-400" />
                     Email Address
                   </Label>
-                  <Input placeholder="john@example.com" />
+                  <Input placeholder="john@example.com" size="sm" />
                   <FieldError />
                 </TextField>
 
@@ -226,8 +227,8 @@ export default function LoginPage() {
                   value={password}
                   onChange={setPassword}
                 >
-                  <Label className="text-sm text-gray-300">
-                    <Lock size={14} className="inline mr-1.5 text-violet-400" />
+                  <Label className="text-xs text-gray-300">
+                    <Lock size={12} className="inline mr-1.5 text-violet-400" />
                     Password
                   </Label>
                   <InputGroup>
@@ -235,6 +236,7 @@ export default function LoginPage() {
                       type={isVisible ? "text" : "password"}
                       placeholder="Enter your password"
                       className="w-full"
+                      size="sm"
                     />
                     <InputGroup.Suffix>
                       <Button
@@ -248,9 +250,9 @@ export default function LoginPage() {
                         className="text-gray-400"
                       >
                         {isVisible ? (
-                          <Eye className="size-4" />
+                          <Eye className="size-3.5" />
                         ) : (
-                          <EyeSlash className="size-4" />
+                          <EyeSlash className="size-3.5" />
                         )}
                       </Button>
                     </InputGroup.Suffix>
@@ -262,7 +264,7 @@ export default function LoginPage() {
                 <div className="flex justify-end">
                   <Link
                     href="/forgot-password"
-                    className="text-xs text-violet-400 hover:text-violet-300 transition"
+                    className="text-[10px] text-violet-400 hover:text-violet-300 transition"
                   >
                     Forgot password?
                   </Link>
@@ -271,43 +273,43 @@ export default function LoginPage() {
                 {/* Login Button - Full Width */}
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 text-white font-medium shadow-lg shadow-violet-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                  className="w-full h-10 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 text-white font-medium shadow-lg shadow-violet-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl text-sm"
                 >
-                  <LogIn size={16} className="mr-2" />
+                  <LogIn size={14} className="mr-2" />
                   Sign In
                 </Button>
 
                 {/* Divider */}
-                <div className="relative my-2">
+                <div className="relative my-1">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-white/10"></div>
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="px-3 bg-transparent text-gray-500">
+                    <span className="px-2 bg-transparent text-gray-500 text-[10px]">
                       Or continue with
                     </span>
                   </div>
                 </div>
 
-                <div className="flex justify-center gap-4">
+                <div className="flex justify-center gap-3">
                   <button
                     onClick={handleGoogleLogin}
-                    className="p-3 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
+                    className="p-2 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
                     aria-label="Sign in with Google"
                   >
-                    <FcGoogle size={20} />
+                    <FcGoogle size={18} />
                   </button>
                   <button
                     onClick={handleGithubLogin}
-                    className="p-3 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
+                    className="p-2 rounded-full border cursor-pointer border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-110"
                     aria-label="Sign in with GitHub"
                   >
-                    <FaGithub size={20} />
+                    <FaGithub size={18} />
                   </button>
                 </div>
 
                 {/* Sign Up Link */}
-                <p className="text-center text-sm text-gray-400 mt-2">
+                <p className="text-center text-xs text-gray-400 mt-1">
                   Don&apos;t have an account?{" "}
                   <Link
                     href="/auth/signup"
