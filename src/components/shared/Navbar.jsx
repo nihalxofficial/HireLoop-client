@@ -21,6 +21,7 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
+  // console.log(user);
 
   const router = useRouter();
 

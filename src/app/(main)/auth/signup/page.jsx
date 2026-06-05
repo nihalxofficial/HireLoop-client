@@ -69,6 +69,7 @@ export default function SignupPage() {
       email: userData.email,
       password: userData.password,
       image: userData.image,
+      role: userData.role,
     });
     
     if (data) {
@@ -391,7 +392,7 @@ export default function SignupPage() {
                       <input
                         type="radio"
                         name="role"
-                        value="jobseeker"
+                        value="seeker"
                         defaultChecked
                         className="w-3.5 h-3.5 text-violet-500"
                       />
