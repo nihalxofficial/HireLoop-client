@@ -54,8 +54,8 @@ export default function DashNav({ onMenuClick }) {
           >
             <Menu size={20} />
           </button>
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30">
               <span className="text-sm font-bold">HL</span>
             </div>
             <span className="font-semibold text-white hidden sm:inline">HireLoop</span>
@@ -84,14 +84,14 @@ export default function DashNav({ onMenuClick }) {
 
         {/* Right - Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 transition-all duration-300 hover:bg-white/10 hover:text-white">
+          <button className="relative cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 transition-all duration-300 hover:bg-white/10 hover:text-white">
             <MessageSquare size={18} />
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-violet-500 text-[8px] font-bold text-white">
               3
             </span>
           </button>
 
-          <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 transition-all duration-300 hover:bg-white/10 hover:text-white">
+          <button className="relative cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 transition-all duration-300 hover:bg-white/10 hover:text-white">
             <Bell size={18} />
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[8px] font-bold text-white">
               5
@@ -102,7 +102,7 @@ export default function DashNav({ onMenuClick }) {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 rounded-xl px-2 py-1 transition-all duration-300 hover:bg-white/10"
+              className="flex cursor-pointer items-center gap-2 rounded-xl px-2 py-1 transition-all duration-300 hover:bg-white/10"
             >
               <Image
                 width={32}
@@ -116,7 +116,7 @@ export default function DashNav({ onMenuClick }) {
               />
               <div className="hidden text-left lg:block">
                 <p className="text-sm font-semibold text-white">
-                  {user?.name?.split(" ")[0] || "Job"} Sterling
+                  {user?.name?.split(" ")[0] || "User"}
                 </p>
                 <p className="text-[10px] text-gray-400 capitalize">Recruiter</p>
               </div>
@@ -187,7 +187,7 @@ export default function DashNav({ onMenuClick }) {
                   <div className="border-t border-white/10">
                     <button
                       onClick={handleSignOut}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                      className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
                     >
                       <LogOut size={16} />
                       Sign Out

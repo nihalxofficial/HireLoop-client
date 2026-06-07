@@ -13,15 +13,19 @@ import {
   Star,
   Crown,
   X,
+  PlusCircle,
+  Building2,
+  User,
+  Settings,
 } from "lucide-react";
 
 // Navigation Item Component
-function NavItem({ icon, label, active, badge, onClick }) {
-  return (
+function NavItem({ icon, label, active, badge, onClick, href }) {
+  const content = (
     <button
       onClick={onClick}
       className={`
-        group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm
+        group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm cursor-pointer
         transition-all duration-200
         ${active
           ? "bg-gradient-to-r from-fuchsia-500/10 to-violet-600/10 text-white border border-fuchsia-500/20"
@@ -44,6 +48,11 @@ function NavItem({ icon, label, active, badge, onClick }) {
       )}
     </button>
   );
+
+  if (href) {
+    return <Link href={href}>{content}</Link>;
+  }
+  return content;
 }
 
 // Section Divider
@@ -64,10 +73,17 @@ export default function DashboardSidebar({ isOpen, onClose }) {
   
   const mainNavItems = [
     { id: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard", href: "/dashboard" },
-    { id: "jobs", icon: <BriefcaseBusiness size={18} />, label: "Jobs", badge: "24", href: "/dashboard/jobs" },
+    { id: "jobs", icon: <BriefcaseBusiness size={18} />, label: "Jobs", badge: "24", href: "/dashboard/recruiter/jobs" },
+    { id: "add-job", icon: <PlusCircle size={18} />, label: "Post a Job", href: "/dashboard/recruiter/jobs/new" },
+    { id: "company", icon: <Building2 size={18} />, label: "Company", href: "/dashboard/recruiter/company" },
     { id: "candidates", icon: <Users size={18} />, label: "Candidates", badge: "12", href: "/dashboard/candidates" },
     { id: "analytics", icon: <BarChart3 size={18} />, label: "Analytics", href: "/dashboard/analytics" },
     { id: "messages", icon: <MessageSquare size={18} />, label: "Messages", badge: "3", href: "/dashboard/messages" },
+  ];
+  
+  const settingsNavItems = [
+    { id: "profile", icon: <User size={18} />, label: "Profile", href: "/dashboard/profile" },
+    { id: "settings", icon: <Settings size={18} />, label: "Settings", href: "/dashboard/settings" },
   ];
   
   const secondNavItems = [
@@ -116,14 +132,15 @@ export default function DashboardSidebar({ isOpen, onClose }) {
           <div className="flex-1 overflow-y-auto px-3 py-6">
             <nav className="space-y-1">
               {mainNavItems.map((item) => (
-                <Link href={item.href} key={item.id} className="block" onClick={onClose}>
-                  <NavItem
-                    icon={item.icon}
-                    label={item.label}
-                    active={isActive(item.href)}
-                    badge={item.badge}
-                  />
-                </Link>
+                <NavItem
+                  key={item.id}
+                  icon={item.icon}
+                  label={item.label}
+                  active={isActive(item.href)}
+                  badge={item.badge}
+                  href={item.href}
+                  onClick={onClose}
+                />
               ))}
             </nav>
             
@@ -131,13 +148,29 @@ export default function DashboardSidebar({ isOpen, onClose }) {
             
             <nav className="space-y-1">
               {secondNavItems.map((item) => (
-                <Link href={item.href} key={item.id} className="block" onClick={onClose}>
-                  <NavItem
-                    icon={item.icon}
-                    label={item.label}
-                    active={isActive(item.href)}
-                  />
-                </Link>
+                <NavItem
+                  key={item.id}
+                  icon={item.icon}
+                  label={item.label}
+                  active={isActive(item.href)}
+                  href={item.href}
+                  onClick={onClose}
+                />
+              ))}
+            </nav>
+            
+            <SectionDivider label="Account" />
+            
+            <nav className="space-y-1">
+              {settingsNavItems.map((item) => (
+                <NavItem
+                  key={item.id}
+                  icon={item.icon}
+                  label={item.label}
+                  active={isActive(item.href)}
+                  href={item.href}
+                  onClick={onClose}
+                />
               ))}
             </nav>
             
@@ -150,7 +183,7 @@ export default function DashboardSidebar({ isOpen, onClose }) {
               <p className="mt-2 text-[11px] text-gray-400">
                 Get access to premium features and priority support.
               </p>
-              <button className="mt-3 w-full rounded-lg bg-gradient-to-r from-fuchsia-500 to-violet-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:scale-[1.02]">
+              <button className="mt-3 w-full cursor-pointer rounded-lg bg-gradient-to-r from-fuchsia-500 to-violet-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:scale-[1.02]">
                 Upgrade Now
               </button>
             </div>
