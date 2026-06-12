@@ -6,7 +6,7 @@ import { Building2, Globe, MapPin, Users, Mail, Plus, Edit, Trash2, Eye, CheckCi
 import Link from "next/link";
 import Image from "next/image";
 import { addCompany, editCompany, deleteCompany } from "@/lib/actions/companies";
-import { getCompanies } from "@/lib/api/companies";
+import { getRecruiterCompanies } from "@/lib/api/companies";
 import { toast } from "react-toastify";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -21,8 +21,6 @@ const EMPLOYEE_RANGES = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000
 
 const VALID_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg"];
 const MAX_FILE_SIZE     = 5 * 1024 * 1024; // 5MB
-
-const LOGO_FALLBACK = "https://ui-avatars.com/api/?background=7c3aed&color=fff&size=64&bold=true&name=Co";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -46,7 +44,7 @@ const getStatusBadge = (status) => {
 
 const inputClass = {
     input: "text-white placeholder:text-gray-500",
-    inputWrapper: "border-white/10 bg-white/5 hover:border-violet-500/50",
+    inputWrapper: "border-white/10 bg-white/5 hover:border-violet-500/50 focus-within:border-violet-500",
 };
 
 const Field = ({ label, children }) => (
@@ -231,7 +229,7 @@ const CompanyForm = ({ company, isEditing, onSave, onCancel, recruiter }) => {
         recruiterEmail: company?.recruiterEmail || "",
         logo:           company?.logo           || "",
         coverImage:     company?.coverImage     || "",
-        recruiterId:    recruiter.id,
+        recruiterId:    recruiter?.id,
     });
 
     const [submitting,    setSubmitting]    = useState(false);
@@ -305,7 +303,9 @@ const CompanyForm = ({ company, isEditing, onSave, onCancel, recruiter }) => {
 
                 {/* Industry dropdown */}
                 <Field label="Industry / Category">
-                    <Select value={formData.industry} onChange={(v) => handleChange("industry", v)}
+                    <Select 
+                        selectedKeys={formData.industry ? new Set([formData.industry]) : new Set()}
+                        onSelectionChange={(keys) => handleChange("industry", Array.from(keys)[0])}
                         aria-label="Industry / Category" variant="secondary" className="w-full"
                         classNames={{ trigger: "border-white/10 bg-white/5 hover:border-violet-500/50", value: "text-white" }}>
                         <Select.Trigger>
@@ -338,7 +338,9 @@ const CompanyForm = ({ company, isEditing, onSave, onCancel, recruiter }) => {
 
                 {/* Employee count dropdown */}
                 <Field label="Employee Count Range">
-                    <Select value={formData.employeeCount} onChange={(v) => handleChange("employeeCount", v)}
+                    <Select 
+                        selectedKeys={formData.employeeCount ? new Set([formData.employeeCount]) : new Set()}
+                        onSelectionChange={(keys) => handleChange("employeeCount", Array.from(keys)[0])}
                         aria-label="Employee Count Range" variant="secondary" className="w-full"
                         classNames={{ trigger: "border-white/10 bg-white/5 hover:border-violet-500/50", value: "text-white" }}>
                         <Select.Trigger>
@@ -381,9 +383,8 @@ const CompanyForm = ({ company, isEditing, onSave, onCancel, recruiter }) => {
                             <Image
                                 src={logoPreview}
                                 alt="Company Logo"
-                                width={96}
-                                height={96}
-                                unoptimized
+                                width={400}
+                                height={400}
                                 className="w-24 h-24 rounded-xl object-cover mx-auto ring-2 ring-violet-500/30"
                             />
                             <button onClick={(e) => { e.stopPropagation(); removeLogo(); }}
@@ -420,9 +421,9 @@ const CompanyForm = ({ company, isEditing, onSave, onCancel, recruiter }) => {
                             <Image
                                 src={formData.coverImage}
                                 alt="Cover preview"
-                                fill
-                                unoptimized
-                                className="object-cover opacity-80"
+                                width={400}
+                                height={300}
+                                className="w-full h-full object-cover opacity-80"
                                 onError={(e) => { e.target.style.display = "none"; }}
                             />
                             <button
@@ -449,11 +450,11 @@ const CompanyForm = ({ company, isEditing, onSave, onCancel, recruiter }) => {
 
             {/* Form actions */}
             <div className="flex justify-end gap-3 pt-4">
-                <Button onPress={onCancel} variant="secondary" className="cursor-pointer text-gray-300 hover:text-white">
+                <Button onPress={onCancel} variant="light" className="cursor-pointer text-gray-300 hover:text-white">
                     Cancel
                 </Button>
                 <Button onPress={handleSubmit} isLoading={submitting}
-                    className="cursor-pointer bg-linear-to-r from-fuchsia-500 to-violet-600 text-white">
+                    className="cursor-pointer bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20">
                     {isEditing ? "Save Changes" : "Register Company"}
                 </Button>
             </div>
@@ -464,23 +465,31 @@ const CompanyForm = ({ company, isEditing, onSave, onCancel, recruiter }) => {
 
 // ─── Companies Page ────────────────────────────────────────────────────────────
 
-export const CompaniesPageClient = ({ recruiter }) => {
+export const CompaniesPageClient = ({ recruiter, initialCompanies }) => {
 
-    const [companies,       setCompanies]       = useState([]);
-    const [loading,         setLoading]         = useState(true);
+    const [companies,       setCompanies]       = useState(initialCompanies || []);
+    const [loading,         setLoading]         = useState(false);
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [isEditing,       setIsEditing]       = useState(false);
     const [isModalOpen,     setIsModalOpen]     = useState(false);
 
+    // Only fetch if initialCompanies is empty and we have a recruiter
     useEffect(() => {
         const fetchCompanies = async () => {
-            setLoading(true);
-            const data = await getCompanies();
-            setCompanies(data);
-            setLoading(false);
+            if ((!initialCompanies || initialCompanies.length === 0) && recruiter?.id) {
+                setLoading(true);
+                try {
+                    const data = await getRecruiterCompanies(recruiter.id);
+                    setCompanies(data || []);
+                } catch (error) {
+                    console.error("Error fetching companies:", error);
+                } finally {
+                    setLoading(false);
+                }
+            }
         };
         fetchCompanies();
-    }, []);
+    }, [recruiter?.id, initialCompanies]);
 
     const handleAddNew = () => {
         setSelectedCompany(null);
@@ -521,10 +530,14 @@ export const CompaniesPageClient = ({ recruiter }) => {
             } else {
                 const payload = await addCompany(formData);
                 if (payload) {
-                    setCompanies((prev) => [
-                        ...prev,
-                        { ...formData, _id: payload.insertedId, status: "pending", createdAt: new Date().toISOString() },
-                    ]);
+                    const newCompany = { 
+                        ...formData, 
+                        _id: payload.insertedId, 
+                        status: "pending", 
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    };
+                    setCompanies((prev) => [newCompany, ...prev]);
                     toast.success("New Company Added");
                 }
             }
@@ -535,29 +548,100 @@ export const CompaniesPageClient = ({ recruiter }) => {
         }
     };
 
-    // ── Loading skeleton ──────────────────────────────────────────────────────
-
-    if (loading) return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <div className="h-1.5 w-1.5 rounded-full bg-orange-400/50 animate-pulse" />
-                        <div className="h-2.5 w-32 bg-white/10 rounded animate-pulse" />
-                        <div className="h-1.5 w-1.5 rounded-full bg-orange-400/50 animate-pulse" />
+    // Show loading skeletons while fetching data
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="h-1.5 w-1.5 rounded-full bg-orange-400/50 animate-pulse" />
+                            <div className="h-2.5 w-32 bg-white/10 rounded animate-pulse" />
+                            <div className="h-1.5 w-1.5 rounded-full bg-orange-400/50 animate-pulse" />
+                        </div>
+                        <div className="h-8 w-48 bg-white/10 rounded animate-pulse mb-2" />
+                        <div className="h-4 w-96 bg-white/10 rounded animate-pulse" />
                     </div>
-                    <div className="h-8 w-48 bg-white/10 rounded animate-pulse mb-2" />
-                    <div className="h-4 w-96 bg-white/10 rounded animate-pulse" />
+                    <div className="h-10 w-40 bg-white/10 rounded-xl animate-pulse" />
                 </div>
-                <div className="h-10 w-40 bg-white/10 rounded-xl animate-pulse" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <CompanyCardSkeleton key={i} />
+                    ))}
+                </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3, 4, 5, 6].map((i) => <CompanyCardSkeleton key={i} />)}
-            </div>
-        </div>
-    );
+        );
+    }
 
-    // ── Render ────────────────────────────────────────────────────────────────
+    // Show empty state
+    if (!loading && companies.length === 0) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                            <span className="text-[10px] uppercase tracking-[0.28em] text-gray-300">Company Management</span>
+                            <div className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                        </div>
+                        <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">My Companies</h1>
+                        <p className="text-sm text-gray-400 mt-2">Manage your registered companies and their verification states.</p>
+                    </div>
+                    <Button onPress={handleAddNew}
+                        className="cursor-pointer bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+                        <Plus size={16} /> Register New Company
+                    </Button>
+                </div>
+                <div className="flex flex-col items-center justify-center min-h-[50vh]">
+                    <div className="rounded-full bg-white/5 p-6 mb-4 border border-white/10">
+                        <Building size={48} className="text-gray-500" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-white mb-2">No Companies Registered</h2>
+                    <p className="text-gray-400 text-center max-w-md mb-6">
+                        You haven&apos;t registered any company yet. Register your first company to start posting jobs and hiring talent.
+                    </p>
+                    <Button onPress={handleAddNew} className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
+                        <Plus size={16} /> Register Your First Company
+                    </Button>
+                </div>
+
+                {/* Add Modal */}
+                <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen}>
+                    <Modal.Backdrop>
+                        <Modal.Container placement="center">
+                            <Modal.Dialog className="sm:max-w-2xl bg-[#050816] border border-white/10 max-h-[90vh] flex flex-col">
+                                <Modal.CloseTrigger />
+                                <Modal.Header className="shrink-0">
+                                    <Modal.Icon className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
+                                        <Building2 className="size-5" />
+                                    </Modal.Icon>
+                                    <Modal.Heading className="text-white">
+                                        Register New Company
+                                    </Modal.Heading>
+                                    <p className="mt-1.5 text-sm leading-5 text-gray-400">
+                                        Enter your business details to start hiring on HireLoop
+                                    </p>
+                                </Modal.Header>
+                                <Modal.Body className="p-6 overflow-y-auto flex-1">
+                                    <Surface variant="default" className="bg-transparent">
+                                        <CompanyForm
+                                            company={selectedCompany}
+                                            isEditing={isEditing}
+                                            onSave={handleSave}
+                                            onCancel={() => setIsModalOpen(false)}
+                                            recruiter={recruiter}
+                                        />
+                                    </Surface>
+                                </Modal.Body>
+                            </Modal.Dialog>
+                        </Modal.Container>
+                    </Modal.Backdrop>
+                </Modal>
+            </div>
+        );
+    }
+
+    // ── Render companies ────────────────────────────────────────────────────────
 
     return (
         <div className="space-y-6">
@@ -574,37 +658,22 @@ export const CompaniesPageClient = ({ recruiter }) => {
                     <p className="text-sm text-gray-400 mt-2">Manage your registered companies and their verification states.</p>
                 </div>
                 <Button onPress={handleAddNew}
-                    className="cursor-pointer bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+                    className="cursor-pointer bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
                     <Plus size={16} /> Register New Company
                 </Button>
             </div>
 
-            {/* Empty state */}
-            {companies.length === 0 ? (
-                <div className="flex flex-col items-center justify-center min-h-[50vh]">
-                    <div className="rounded-full bg-white/5 p-6 mb-4 border border-white/10">
-                        <Building size={48} className="text-gray-500" />
-                    </div>
-                    <h2 className="text-xl font-semibold text-white mb-2">No Companies Registered</h2>
-                    <p className="text-gray-400 text-center max-w-md mb-6">
-                        You haven&apos;t registered any company yet. Register your first company to start posting jobs and hiring talent.
-                    </p>
-                    <Button onPress={handleAddNew} className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white">
-                        <Plus size={16} /> Register Your First Company
-                    </Button>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {companies.map((company) => (
-                        <CompanyCard
-                            key={company._id}
-                            company={company}
-                            onEdit={handleEdit}
-                            onDelete={handleDelete}
-                        />
-                    ))}
-                </div>
-            )}
+            {/* Companies Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {companies.map((company) => (
+                    <CompanyCard
+                        key={company._id}
+                        company={company}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
+                ))}
+            </div>
 
             {/* Add / Edit Modal */}
             <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -613,7 +682,7 @@ export const CompaniesPageClient = ({ recruiter }) => {
                         <Modal.Dialog className="sm:max-w-2xl bg-[#050816] border border-white/10 max-h-[90vh] flex flex-col">
                             <Modal.CloseTrigger />
                             <Modal.Header className="shrink-0">
-                                <Modal.Icon className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white">
+                                <Modal.Icon className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
                                     <Building2 className="size-5" />
                                 </Modal.Icon>
                                 <Modal.Heading className="text-white">

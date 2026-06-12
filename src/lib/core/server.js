@@ -1,6 +1,10 @@
-import { revalidatePath } from "next/cache";
-
 const Api = process.env.NEXT_PUBLIC_API;
+
+export const serverFetch = async(path)=>{
+    const res = await fetch(`${Api}${path}`);
+    const data = await res.json();
+    return data;
+}
 
 export const serverMutation = async(path, data, id="")=>{
     const res = await fetch(`${Api}${path}`,{

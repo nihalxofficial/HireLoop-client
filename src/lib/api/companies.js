@@ -1,8 +1,5 @@
-const Api = process.env.NEXT_PUBLIC_API;
+import { serverFetch } from "../core/server";
 
-
-export const getCompanies = async()=>{
-    const res = await fetch(`${Api}/my/companies`);
-    const data = await res.json();
-    return data;
-}
+export const getRecruiterCompanies = async(recruiterId)=>{
+    return serverFetch(`/my/companies?recruiterId=${recruiterId}`)
+} 
