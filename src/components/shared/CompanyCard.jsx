@@ -35,29 +35,6 @@ const StatusBadge = ({ status }) => {
     );
 };
 
-// ─── CompanyCard ───────────────────────────────────────────────────────────────
-
-/**
- * Props:
- *   company      — company object (see shape below)
- *   onEdit       — (company) => void
- *   onDelete     — (companyId) => void
- *
- * Company shape:
- * {
- *   _id:           string
- *   name:          string
- *   logo?:         string   (URL)
- *   coverImage?:   string   (URL)
- *   industry?:     string
- *   location?:     string
- *   employeeCount?:string
- *   recruiterEmail?:string
- *   description?:  string
- *   status:        "approved" | "pending" | "rejected"
- *   createdAt?:    string | Date
- * }
- */
 const CompanyCard = ({ company, onEdit, onDelete }) => {
     const [logoError, setLogoError] = useState(false);
 

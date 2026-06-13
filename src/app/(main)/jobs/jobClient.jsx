@@ -183,6 +183,7 @@ const JobClient = ({ initialJobs, companies }) => {
 
     // Initial filter on component mount
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         filterJobs();
     }, []);
 
@@ -232,7 +233,7 @@ const JobClient = ({ initialJobs, companies }) => {
                         </div>
                         <Button
                             onPress={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="lg:hidden bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white"
+                            className="lg:hidden bg-linear-to-r from-fuchsia-500 to-violet-600 text-white"
                             startContent={<Filter size={16} />}
                         >
                             Filters
@@ -244,7 +245,7 @@ const JobClient = ({ initialJobs, companies }) => {
                 <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 mb-6">
                     <div className="flex flex-col sm:flex-row gap-4 md:items-center">
                         {/* Search Input */}
-                        <div className="flex-[2]">
+                        <div className="flex-2">
                             <div className="relative">
                                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                                 <input
@@ -302,7 +303,7 @@ const JobClient = ({ initialJobs, companies }) => {
                         {/* Search Button */}
                         <button
                             onClick={handleSearch}
-                            className="rounded-xl cursor-pointer bg-gradient-to-r from-fuchsia-500 to-violet-600 px-6 py-2.5 text-white text-sm font-medium hover:scale-[1.02] transition-all"
+                            className="rounded-xl cursor-pointer bg-linear-to-r from-fuchsia-500 to-violet-600 px-6 py-2.5 text-white text-sm font-medium hover:scale-[1.02] transition-all"
                         >
                             Search
                         </button>
@@ -312,7 +313,7 @@ const JobClient = ({ initialJobs, companies }) => {
                 {/* Main Content with Sidebar */}
                 <div className="flex gap-6">
                     {/* Sidebar Filters - Desktop */}
-                    <div className="hidden lg:block w-80 flex-shrink-0">
+                    <div className="hidden lg:block w-80 shrink-0">
                         <div className="sticky top-24">
                             <div className="rounded-2xl border border-white/10 bg-[#0a0f1a] shadow-2xl overflow-hidden">
                                 <div className="px-5 py-4 border-b border-white/10 bg-white/5">

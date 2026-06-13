@@ -103,7 +103,7 @@ const JobCard = ({ job, companies }) => {
 
             {/* Salary */}
             <div className="flex items-center gap-1.5 mb-3">
-                <DollarSign size={14} className="text-emerald-400" />
+                {/* <DollarSign size={14} className="text-emerald-400" /> */}
                 <span className="text-sm font-medium text-emerald-400">
                     {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
                 </span>
@@ -132,7 +132,7 @@ const JobCard = ({ job, companies }) => {
                     </span>
                 </div>
                 <Link href={`/jobs/${job._id}`}>
-                    <button className="cursor-pointer px-4 py-1.5 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white text-sm font-medium hover:scale-[1.05] transition-all duration-300">
+                    <button className="cursor-pointer px-4 py-1.5 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 text-white text-sm font-medium hover:scale-[1.05] transition-all duration-300">
                         View Details
                     </button>
                 </Link>
