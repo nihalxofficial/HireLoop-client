@@ -1,4 +1,4 @@
-// components/jobs/JobCard.jsx
+// components/shared/JobCard.jsx
 "use client";
 
 import React from "react";
@@ -12,7 +12,10 @@ import {
     Building2,
 } from "lucide-react";
 
-const JobCard = ({ job }) => {
+const JobCard = ({ job, companies }) => {
+    // Find the company details using companyId
+    const company = companies?.find(c => c._id === job.companyId);
+    
     const formatSalary = (min, max, currency) => {
         const symbol = currency === "usd" ? "$" : 
                       currency === "eur" ? "€" : 
@@ -58,16 +61,31 @@ const JobCard = ({ job }) => {
                         {job.title}
                     </h3>
                 </Link>
-                <span className={`text-xs px-2.5 py-1 rounded-full border ${getJobTypeColor(job.type)}`}>
+                <span className={`text-xs px-2.5 py-1 rounded-full border whitespace-nowrap ${getJobTypeColor(job.type)}`}>
                     {job.type}
                 </span>
             </div>
 
-            {/* Company Name */}
-            <div className="flex items-center gap-2 mb-3">
-                <Building2 size={14} className="text-violet-400" />
-                <span className="text-sm text-gray-300">{job.companyId?.name || "Company"}</span>
-            </div>
+            {/* Company Logo and Name - Clickable to company details */}
+            <Link href={`/companies/${company?._id}`} className="block mb-3">
+                <div className="flex items-center gap-2">
+                    {company?.logo ? (
+                        <img
+                            src={company.logo}
+                            alt={company.name}
+                            className="w-6 h-6 rounded object-cover"
+                            onError={(e) => {
+                                e.target.src = `https://ui-avatars.com/api/?background=7c3aed&color=fff&size=32&bold=true&name=${encodeURIComponent(company?.name || "C")}`;
+                            }}
+                        />
+                    ) : (
+                        <Building2 size={16} className="text-violet-400" />
+                    )}
+                    <span className="text-sm text-gray-300 hover:text-violet-400 transition-colors">
+                        {company?.name || "Company"}
+                    </span>
+                </div>
+            </Link>
 
             {/* Location and Remote Status */}
             <div className="flex items-center gap-4 mb-3">
