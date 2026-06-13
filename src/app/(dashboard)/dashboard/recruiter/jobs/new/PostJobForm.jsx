@@ -257,6 +257,7 @@ const PostJobForm = ({ companies, recruiter }) => {
             benefits:         formData.get("benefits"),
             status:           "active",
             companyId:        selectedCompanyId,
+            recruiterId:      recruiter.id,
         };
         const result = await addJob(jobData);
         if (result?.insertedId) {

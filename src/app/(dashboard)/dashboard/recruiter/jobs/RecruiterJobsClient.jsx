@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { deleteJob, duplicateJob, updateJobStatus } from "@/lib/actions/jobs";
+import { deleteJob, updateJobStatus } from "@/lib/actions/jobs";
 
 const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
     const router = useRouter();
@@ -38,6 +38,7 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
     const [loading, setLoading] = useState(false);
 
     // Helper function to get company name by companyId
+
     const getCompanyName = (companyId) => {
         const company = recruiterCompanies?.find(c => c._id === companyId);
         return company?.name || "Unknown Company";
@@ -53,7 +54,6 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
                     toast.success("Job deleted successfully");
                 }
             } catch (error) {
-                console.error("Error deleting job:", error);
                 toast.error("Failed to delete job");
             } finally {
                 setLoading(false);
@@ -73,27 +73,10 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
                     toast.success(`Job status updated to ${newStatus}`);
                 }
             } catch (error) {
-                console.error("Error updating job status:", error);
                 toast.error("Failed to update job status");
             } finally {
                 setLoading(false);
             }
-        }
-    };
-
-    const handleDuplicateJob = async (job) => {
-        try {
-            setLoading(true);
-            const result = await duplicateJob(job);
-            if (result.success) {
-                setJobs([result.data, ...jobs]);
-                toast.success("Job duplicated successfully");
-            }
-        } catch (error) {
-            console.error("Error duplicating job:", error);
-            toast.error("Failed to duplicate job");
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -169,7 +152,7 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
                             Manage all your job listings, track applications, and update statuses.
                         </p>
                     </div>
-                    <Button className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+                    <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
                         <Link href="/dashboard/recruiter/jobs/new" className="flex items-center gap-1">
                             <Plus size={16} />
                             Post New Job
@@ -338,7 +321,7 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
                                 <th className="text-left px-5 py-4 text-xs font-medium uppercase tracking-wider text-gray-400">COMPANY</th>
                                 <th className="text-left px-5 py-4 text-xs font-medium uppercase tracking-wider text-gray-400">STATUS</th>
                                 <th className="text-left px-5 py-4 text-xs font-medium uppercase tracking-wider text-gray-400">APPLICANTS</th>
-                                <th className="text-left px-5 py-4 text-xs font-medium uppercase tracking-wider text-gray-400">POSTED DATE</th>
+                                <th className="text-left px-5 py-4 text-xs font-medium uppercase tracking-wider whitespace-nowrap text-gray-400">POSTED DATE</th>
                                 <th className="text-left px-5 py-4 text-xs font-medium uppercase tracking-wider text-gray-400">DEADLINE</th>
                                 <th className="text-center px-5 py-4 text-xs font-medium uppercase tracking-wider text-gray-400">ACTIONS</th>
                             </tr>
@@ -350,11 +333,11 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
                                         <div className="text-center">
                                             <BriefcaseBusiness size={48} className="text-gray-600 mx-auto mb-4" />
                                             <p className="text-gray-400 mb-4">No jobs found</p>
-                                            <Link href="/dashboard/recruiter/jobs/new">
-                                                <Button className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+                                            <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+                                                <Link href="/dashboard/recruiter/jobs/new">
                                                     Post Your First Job
-                                                </Button>
-                                            </Link>
+                                                </Link>
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>
@@ -369,11 +352,11 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
                                                         {job.title}
                                                     </p>
                                                     <div className="flex items-center gap-2 mt-1">
-                                                        <span className="text-xs text-gray-400">{job.category}</span>
+                                                        <span className="text-xs text-gray-400 whitespace-nowrap">{job.category}</span>
                                                         <span className="w-1 h-1 rounded-full bg-gray-500" />
-                                                        <span className="text-xs text-gray-400">{job.type}</span>
+                                                        <span className="text-xs text-gray-400 whitespace-nowrap">{job.type}</span>
                                                         <span className="w-1 h-1 rounded-full bg-gray-500" />
-                                                        <span className="text-xs text-gray-400">{job.location}</span>
+                                                        <span className="text-xs text-gray-400 whitespace-nowrap">{job.location}</span>
                                                     </div>
                                                     {job.salaryMin && job.salaryMax && (
                                                         <p className="text-xs text-emerald-400 mt-1">
@@ -385,7 +368,7 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center gap-2">
                                                     <Building2 size={14} className="text-violet-400" />
-                                                    <span className="text-sm text-gray-300">
+                                                    <span className="text-sm text-gray-300 whitespace-nowrap">
                                                         {getCompanyName(job.companyId)}
                                                     </span>
                                                 </div>
@@ -407,31 +390,31 @@ const RecruiterJobsClient = ({ recruiterCompanies, recruiterJobs }) => {
                                                 </div>
                                             </td>
                                             <td className="px-5 py-4">
-                                                <span className="text-sm text-gray-400">{formatDate(job.createdAt)}</span>
+                                                <span className="text-sm whitespace-nowrap text-gray-400">{formatDate(job.createdAt)}</span>
                                             </td>
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center gap-1.5">
                                                     <Calendar size={12} className="text-gray-500" />
-                                                    <span className={`text-sm ${new Date(job.deadline) < new Date() ? 'text-red-400' : 'text-gray-400'}`}>
+                                                    <span className={`text-sm whitespace-nowrap ${new Date(job.deadline) < new Date() ? 'text-red-400' : 'text-gray-400'}`}>
                                                         {formatDate(job.deadline)}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <Link href={`/dashboard/recruiter/jobs/${job._id}/applicants`}>
-                                                        <button className="p-1.5 rounded-lg text-gray-400 hover:text-violet-400 hover:bg-white/10 transition-all duration-200 group-hover:scale-105" title="View Applicants">
+                                                    <button className="p-1.5 rounded-lg text-gray-400 hover:text-violet-400 hover:bg-white/10 transition-all duration-200 group-hover:scale-105" title="View Applicants">
+                                                        <Link href={`/dashboard/recruiter/jobs/${job._id}/applicants`}>
                                                             <Users size={16} />
-                                                        </button>
-                                                    </Link>
-                                                    <Link href={`/dashboard/recruiter/jobs/${job._id}/edit`}>
-                                                        <button className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-400 hover:bg-white/10 transition-all duration-200 group-hover:scale-105" title="Edit Job">
-                                                            <Edit size={16} />
-                                                        </button>
-                                                    </Link>
-                                                    <button onClick={() => handleDuplicateJob(job)} className="p-1.5 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-white/10 transition-all duration-200 group-hover:scale-105" title="Duplicate">
-                                                        <Copy size={16} />
+                                                        </Link>
                                                     </button>
+                                                    <button className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-400 hover:bg-white/10 transition-all duration-200 group-hover:scale-105" title="Edit Job">
+                                                        <Link href={`/dashboard/recruiter/jobs/${job._id}/edit`}>
+                                                            <Edit size={16} />
+                                                        </Link>
+                                                    </button>
+                                                    <Link href={"/"} className="p-1.5 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-white/10 transition-all duration-200 group-hover:scale-105" title="View">
+                                                        <Eye size={16} />
+                                                    </Link>
                                                     <Select
                                                         className="w-28"
                                                         selectedKeys={job.status ? new Set([job.status]) : new Set()}

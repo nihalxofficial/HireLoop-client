@@ -28,7 +28,7 @@ function NavItem({ icon, label, active, badge, onClick, href }) {
         group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm cursor-pointer
         transition-all duration-200
         ${active
-          ? "bg-gradient-to-r from-fuchsia-500/10 to-violet-600/10 text-white border border-fuchsia-500/20"
+          ? "bg-linear-to-r from-fuchsia-500/10 to-violet-600/10 text-white border border-fuchsia-500/20"
           : "text-gray-400 hover:bg-white/5 hover:text-white"
         }
       `}
@@ -42,7 +42,7 @@ function NavItem({ icon, label, active, badge, onClick, href }) {
       
       <span className="flex-1 text-left">{label}</span>
       {badge && (
-        <span className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-1.5 py-0.5 text-[10px] font-medium text-white">
+        <span className="rounded-full bg-linear-to-r from-fuchsia-500 to-violet-600 px-1.5 py-0.5 text-[10px] font-medium text-white">
           {badge}
         </span>
       )}
@@ -72,9 +72,9 @@ export default function DashboardSidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   
   const mainNavItems = [
-    { id: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard", href: "/dashboard" },
+    { id: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard", href: "/dashboard/recruiter" },
     { id: "jobs", icon: <BriefcaseBusiness size={18} />, label: "Jobs", badge: "24", href: "/dashboard/recruiter/jobs" },
-    { id: "add-job", icon: <PlusCircle size={18} />, label: "Post a Job", href: "/dashboard/recruiter/jobs/new" },
+    // { id: "add-job", icon: <PlusCircle size={18} />, label: "Post a Job", href: "/dashboard/recruiter/jobs/new" },
     { id: "company", icon: <Building2 size={18} />, label: "Company", href: "/dashboard/recruiter/company" },
     { id: "candidates", icon: <Users size={18} />, label: "Candidates", badge: "12", href: "/dashboard/candidates" },
     { id: "analytics", icon: <BarChart3 size={18} />, label: "Analytics", href: "/dashboard/analytics" },
@@ -175,7 +175,7 @@ export default function DashboardSidebar({ isOpen, onClose }) {
             </nav>
             
             {/* Upgrade Card */}
-            <div className="mt-6 rounded-xl bg-gradient-to-br from-fuchsia-500/10 to-violet-600/10 p-4 border border-fuchsia-500/20">
+            <div className="mt-6 rounded-xl bg-linear-to-br from-fuchsia-500/10 to-violet-600/10 p-4 border border-fuchsia-500/20">
               <div className="flex items-center gap-2">
                 <Crown size={14} className="text-violet-400" />
                 <span className="text-xs font-medium text-white">Upgrade to Pro</span>
@@ -183,7 +183,7 @@ export default function DashboardSidebar({ isOpen, onClose }) {
               <p className="mt-2 text-[11px] text-gray-400">
                 Get access to premium features and priority support.
               </p>
-              <button className="mt-3 w-full cursor-pointer rounded-lg bg-gradient-to-r from-fuchsia-500 to-violet-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:scale-[1.02]">
+              <button className="mt-3 w-full cursor-pointer rounded-lg bg-linear-to-r from-fuchsia-500 to-violet-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:scale-[1.02]">
                 Upgrade Now
               </button>
             </div>
