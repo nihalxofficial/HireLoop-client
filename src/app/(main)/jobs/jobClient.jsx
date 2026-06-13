@@ -1,39 +1,32 @@
 // app/jobs/jobClient.jsx
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import { Select, ListBox, Button, Input } from "@heroui/react";
+import React, { useState, useEffect } from 'react';
+import { Select, ListBox, Button } from "@heroui/react";
 import { BriefcaseBusiness, Search, Filter, X, SlidersHorizontal } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import JobCard from '@/components/shared/JobCard';
 
 const JobClient = ({ initialJobs, companies }) => {
-    const [jobs] = useState(initialJobs);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("all");
-    const [selectedJobType, setSelectedJobType] = useState("all");
-    const [selectedLocation, setSelectedLocation] = useState("all");
-    const [salaryRange, setSalaryRange] = useState([0, 200000]);
-    const [selectedCompany, setSelectedCompany] = useState("all");
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // State for jobs and loading
+    const [jobs, setJobs] = useState(initialJobs || []);
+    const [loading, setLoading] = useState(false);
+
+    // Form state for filters
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || "");
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || "all");
+    const [selectedJobType, setSelectedJobType] = useState(searchParams.get('jobType') || "all");
+    const [selectedLocation, setSelectedLocation] = useState(searchParams.get('location') || "all");
+    const [salaryMin, setSalaryMin] = useState(parseInt(searchParams.get('salaryMin')) || 0);
+    const [salaryMax, setSalaryMax] = useState(parseInt(searchParams.get('salaryMax')) || 200000);
+    const [selectedCompany, setSelectedCompany] = useState(searchParams.get('company') || "all");
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    // Extract unique values for filters
-    const categories = useMemo(() => {
-        const cats = new Set(jobs.map(job => job.category));
-        return ["all", ...Array.from(cats)];
-    }, [jobs]);
-
-    const jobTypes = useMemo(() => {
-        const types = new Set(jobs.map(job => job.type));
-        return ["all", ...Array.from(types)];
-    }, [jobs]);
-
-    // Location options with Remote, On-site, Hybrid
-    const locationOptions = ["all", "Remote", "On-site", "Hybrid"];
-
-    const companyList = useMemo(() => {
-        const comps = new Set(jobs.map(job => job.companyId));
-        return ["all", ...Array.from(comps)];
-    }, [jobs]);
+    // Temporary state for search input
+    const [tempSearch, setTempSearch] = useState(searchTerm);
 
     // Get company name by ID
     const getCompanyName = (companyId) => {
@@ -41,41 +34,169 @@ const JobClient = ({ initialJobs, companies }) => {
         return company?.name || "Company";
     };
 
-    // Filter jobs
-    const filteredJobs = jobs.filter(job => {
-        const matchesSearch = searchTerm === "" ||
-            job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            getCompanyName(job.companyId)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            job.location?.toLowerCase().includes(searchTerm.toLowerCase());
+    // Filter jobs client-side based on URL params
+    const filterJobs = () => {
+        let filtered = [...initialJobs];
 
-        const matchesCategory = selectedCategory === "all" || job.category === selectedCategory;
-        const matchesJobType = selectedJobType === "all" || job.type === selectedJobType;
-        
-        let matchesLocation = selectedLocation === "all";
-        if (selectedLocation === "Remote") matchesLocation = job.isRemote === true;
-        if (selectedLocation === "On-site") matchesLocation = job.isRemote === false && job.location;
-        if (selectedLocation === "Hybrid") matchesLocation = job.location?.toLowerCase().includes("hybrid");
-        
-        const matchesSalary = job.salaryMin >= salaryRange[0] && job.salaryMax <= salaryRange[1];
-        const matchesCompany = selectedCompany === "all" || job.companyId === selectedCompany;
+        // Search filter
+        if (searchTerm) {
+            filtered = filtered.filter(job =>
+                job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                getCompanyName(job.companyId)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                job.location?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
 
-        return matchesSearch && matchesCategory && matchesJobType && matchesLocation && matchesSalary && matchesCompany;
-    });
+        // Category filter
+        if (selectedCategory !== "all") {
+            filtered = filtered.filter(job => job.category === selectedCategory);
+        }
 
+        // Job Type filter
+        if (selectedJobType !== "all") {
+            filtered = filtered.filter(job => job.type === selectedJobType);
+        }
+
+        // Location filter
+        if (selectedLocation !== "all") {
+            if (selectedLocation === "Remote") {
+                filtered = filtered.filter(job => job.isRemote === true);
+            } else if (selectedLocation === "On-site") {
+                filtered = filtered.filter(job => job.isRemote === false && job.location);
+            }
+        }
+
+        // Salary filter
+        if (salaryMin > 0) {
+            filtered = filtered.filter(job => job.salaryMin >= salaryMin);
+        }
+        if (salaryMax < 200000) {
+            filtered = filtered.filter(job => job.salaryMax <= salaryMax);
+        }
+
+        // Company filter
+        if (selectedCompany !== "all") {
+            filtered = filtered.filter(job => job.companyId === selectedCompany);
+        }
+
+        setJobs(filtered);
+    };
+
+    // Update URL and filter when filters change
+    const updateURLAndFilter = (overrides = {}) => {
+        const current = {
+            search: tempSearch,
+            category: selectedCategory,
+            jobType: selectedJobType,
+            location: selectedLocation,
+            salaryMin,
+            salaryMax,
+            company: selectedCompany,
+            ...overrides, // <-- new value wins over stale state
+        };
+
+        const params = new URLSearchParams();
+        if (current.search) params.append('search', current.search);
+        if (current.category !== "all") params.append('category', current.category);
+        if (current.jobType !== "all") params.append('jobType', current.jobType);
+        if (current.location !== "all") params.append('location', current.location);
+        if (current.salaryMin > 0) params.append('salaryMin', current.salaryMin);
+        if (current.salaryMax < 200000) params.append('salaryMax', current.salaryMax);
+        if (current.company !== "all") params.append('companyId', current.company);
+
+        const queryString = params.toString();
+        router.push(`/jobs${queryString ? `?${queryString}` : ''}`, { scroll: false });
+
+        setSearchTerm(current.search);
+
+        // Filter using current values, not stale state
+        let filtered = [...initialJobs];
+        if (current.search) {
+            filtered = filtered.filter(job =>
+                job.title?.toLowerCase().includes(current.search.toLowerCase()) ||
+                getCompanyName(job.companyId)?.toLowerCase().includes(current.search.toLowerCase()) ||
+                job.location?.toLowerCase().includes(current.search.toLowerCase())
+            );
+        }
+        if (current.category !== "all") filtered = filtered.filter(job => job.category === current.category);
+        if (current.jobType !== "all") filtered = filtered.filter(job => job.type === current.jobType);
+        if (current.location !== "all") {
+            if (current.location === "Remote") filtered = filtered.filter(job => job.isRemote === true);
+            else if (current.location === "On-site") filtered = filtered.filter(job => job.isRemote === false && job.location);
+        }
+        if (current.salaryMin > 0) filtered = filtered.filter(job => job.salaryMin >= current.salaryMin);
+        if (current.salaryMax < 200000) filtered = filtered.filter(job => job.salaryMax <= current.salaryMax);
+        if (current.company !== "all") filtered = filtered.filter(job => job.companyId === current.company);
+
+        setJobs(filtered);
+    };
+
+    // Handle search button click
+    const handleSearch = () => {
+        updateURLAndFilter({ search: tempSearch });
+    };
+
+    // Handle filter changes — pass new value as override directly
+    const handleCategoryChange = (value) => {
+        setSelectedCategory(value);
+        updateURLAndFilter({ category: value });
+    };
+
+    const handleJobTypeChange = (value) => {
+        setSelectedJobType(value);
+        updateURLAndFilter({ jobType: value });
+    };
+
+    const handleLocationChange = (value) => {
+        setSelectedLocation(value);
+        updateURLAndFilter({ location: value });
+    };
+
+    const handleSalaryChange = (min, max) => {
+        setSalaryMin(min);
+        setSalaryMax(max);
+        updateURLAndFilter({ salaryMin: min, salaryMax: max });
+    };
+
+    const handleCompanyChange = (value) => {
+        setSelectedCompany(value);
+        updateURLAndFilter({ company: value });
+    };
+
+    // Clear all filters
     const clearFilters = () => {
+        setTempSearch("");
         setSearchTerm("");
         setSelectedCategory("all");
         setSelectedJobType("all");
         setSelectedLocation("all");
-        setSalaryRange([0, 200000]);
+        setSalaryMin(0);
+        setSalaryMax(200000);
         setSelectedCompany("all");
+
+        router.push('/jobs', { scroll: false });
+
+        setTimeout(() => {
+            setJobs(initialJobs);
+        }, 0);
     };
 
-    const hasActiveFilters = searchTerm !== "" || 
-        selectedCategory !== "all" || 
-        selectedJobType !== "all" || 
+    // Initial filter on component mount
+    useEffect(() => {
+        filterJobs();
+    }, []);
+
+    // Extract unique values for filters from initialJobs
+    const categories = ["all", ...new Set(initialJobs.map(job => job.category).filter(Boolean))];
+    const jobTypes = ["all", ...new Set(initialJobs.map(job => job.type).filter(Boolean))];
+    const locationOptions = ["all", "Remote", "On-site"];
+    const companyList = ["all", ...new Set(initialJobs.map(job => job.companyId).filter(Boolean))];
+
+    const hasActiveFilters = searchTerm !== "" ||
+        selectedCategory !== "all" ||
+        selectedJobType !== "all" ||
         selectedLocation !== "all" ||
-        salaryRange[0] > 0 || salaryRange[1] < 200000 ||
+        salaryMin > 0 || salaryMax < 200000 ||
         selectedCompany !== "all";
 
     const getDisplayValue = (value, type) => {
@@ -129,19 +250,20 @@ const JobClient = ({ initialJobs, companies }) => {
                                 <input
                                     type="text"
                                     placeholder="Search by title, company, or location..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    value={tempSearch}
+                                    onChange={(e) => setTempSearch(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                     className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-9 pr-4 text-white placeholder:text-gray-500 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500/30"
                                 />
                             </div>
                         </div>
-                        
-                        {/* Category Select */}
+
+                        {/* Category Select — FIXED: value/onChange instead of selectedKeys/onSelectionChange */}
                         <div className="flex-1">
                             <Select
                                 className="w-full"
                                 value={selectedCategory}
-                                onChange={setSelectedCategory}
+                                onChange={(value) => handleCategoryChange(value)}
                                 variant="bordered"
                                 aria-label="Filter by category"
                                 classNames={{
@@ -149,7 +271,6 @@ const JobClient = ({ initialJobs, companies }) => {
                                         "border-white/10",
                                         "bg-white/5",
                                         "hover:border-violet-500/50",
-                                        "data-[focus=true]:border-violet-500",
                                         "rounded-xl",
                                         "h-10",
                                     ],
@@ -179,8 +300,8 @@ const JobClient = ({ initialJobs, companies }) => {
                         </div>
 
                         {/* Search Button */}
-                        <button 
-                            onClick={() => {}} 
+                        <button
+                            onClick={handleSearch}
                             className="rounded-xl cursor-pointer bg-gradient-to-r from-fuchsia-500 to-violet-600 px-6 py-2.5 text-white text-sm font-medium hover:scale-[1.02] transition-all"
                         >
                             Search
@@ -190,12 +311,10 @@ const JobClient = ({ initialJobs, companies }) => {
 
                 {/* Main Content with Sidebar */}
                 <div className="flex gap-6">
-                    {/* Sidebar Filters - Desktop with separate background */}
+                    {/* Sidebar Filters - Desktop */}
                     <div className="hidden lg:block w-80 flex-shrink-0">
                         <div className="sticky top-24">
-                            {/* Separate background container */}
                             <div className="rounded-2xl border border-white/10 bg-[#0a0f1a] shadow-2xl overflow-hidden">
-                                {/* Sidebar Header */}
                                 <div className="px-5 py-4 border-b border-white/10 bg-white/5">
                                     <div className="flex items-center justify-between">
                                         <h3 className="text-white font-semibold flex items-center gap-2">
@@ -213,9 +332,8 @@ const JobClient = ({ initialJobs, companies }) => {
                                     </div>
                                 </div>
 
-                                {/* Scrollable Filter Content */}
                                 <div className="max-h-[calc(100vh-200px)] overflow-y-auto px-5 py-4 space-y-5">
-                                    {/* Job Type Filter */}
+                                    {/* Job Type Filter - Radio Buttons */}
                                     <div>
                                         <h4 className="text-sm font-medium text-white mb-3">Job Type</h4>
                                         <div className="space-y-2">
@@ -226,8 +344,8 @@ const JobClient = ({ initialJobs, companies }) => {
                                                         name="jobType"
                                                         value={type}
                                                         checked={selectedJobType === type}
-                                                        onChange={(e) => setSelectedJobType(e.target.value)}
-                                                        className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500 focus:ring-violet-500/20 focus:ring-offset-0"
+                                                        onChange={() => handleJobTypeChange(type)}
+                                                        className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500 focus:ring-violet-500/20"
                                                     />
                                                     <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
                                                         {type === "all" ? "All Job Types" : type}
@@ -237,7 +355,7 @@ const JobClient = ({ initialJobs, companies }) => {
                                         </div>
                                     </div>
 
-                                    {/* Location Filter */}
+                                    {/* Location Filter - Radio Buttons */}
                                     <div>
                                         <h4 className="text-sm font-medium text-white mb-3">Location</h4>
                                         <div className="space-y-2">
@@ -248,8 +366,8 @@ const JobClient = ({ initialJobs, companies }) => {
                                                         name="location"
                                                         value={loc}
                                                         checked={selectedLocation === loc}
-                                                        onChange={(e) => setSelectedLocation(e.target.value)}
-                                                        className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500 focus:ring-violet-500/20 focus:ring-offset-0"
+                                                        onChange={() => handleLocationChange(loc)}
+                                                        className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500 focus:ring-violet-500/20"
                                                     />
                                                     <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
                                                         {loc === "all" ? "All Locations" : loc}
@@ -268,18 +386,18 @@ const JobClient = ({ initialJobs, companies }) => {
                                                 min="0"
                                                 max="200000"
                                                 step="5000"
-                                                value={salaryRange[0]}
-                                                onChange={(e) => setSalaryRange([parseInt(e.target.value), salaryRange[1]])}
+                                                value={salaryMin}
+                                                onChange={(e) => handleSalaryChange(parseInt(e.target.value), salaryMax)}
                                                 className="w-full h-1.5 rounded-lg appearance-none bg-white/20 accent-violet-500"
                                             />
                                             <div className="flex items-center justify-between text-xs text-gray-400">
-                                                <span>${salaryRange[0].toLocaleString()}</span>
-                                                <span>${salaryRange[1].toLocaleString()}</span>
+                                                <span>${salaryMin.toLocaleString()}</span>
+                                                <span>${salaryMax.toLocaleString()}</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Company Filter */}
+                                    {/* Company Filter - Radio Buttons */}
                                     <div>
                                         <h4 className="text-sm font-medium text-white mb-3">Company</h4>
                                         <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
@@ -290,8 +408,8 @@ const JobClient = ({ initialJobs, companies }) => {
                                                         name="company"
                                                         value={companyId}
                                                         checked={selectedCompany === companyId}
-                                                        onChange={(e) => setSelectedCompany(e.target.value)}
-                                                        className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500 focus:ring-violet-500/20 focus:ring-offset-0"
+                                                        onChange={() => handleCompanyChange(companyId)}
+                                                        className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500 focus:ring-violet-500/20"
                                                     />
                                                     <span className="text-sm text-gray-300 group-hover:text-white transition-colors truncate">
                                                         {companyId === "all" ? "All Companies" : getCompanyName(companyId)}
@@ -300,45 +418,6 @@ const JobClient = ({ initialJobs, companies }) => {
                                             ))}
                                         </div>
                                     </div>
-
-                                    {/* Active Filters */}
-                                    {hasActiveFilters && (
-                                        <div>
-                                            <h4 className="text-sm font-medium text-white mb-3">Active Filters</h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {selectedJobType !== "all" && (
-                                                    <span className="text-xs px-2 py-1 rounded-full bg-violet-500/20 text-violet-400 flex items-center gap-1">
-                                                        {selectedJobType}
-                                                        <X size={12} className="cursor-pointer hover:text-white" onClick={() => setSelectedJobType("all")} />
-                                                    </span>
-                                                )}
-                                                {selectedLocation !== "all" && (
-                                                    <span className="text-xs px-2 py-1 rounded-full bg-violet-500/20 text-violet-400 flex items-center gap-1">
-                                                        {selectedLocation}
-                                                        <X size={12} className="cursor-pointer hover:text-white" onClick={() => setSelectedLocation("all")} />
-                                                    </span>
-                                                )}
-                                                {selectedCategory !== "all" && (
-                                                    <span className="text-xs px-2 py-1 rounded-full bg-violet-500/20 text-violet-400 flex items-center gap-1">
-                                                        {selectedCategory}
-                                                        <X size={12} className="cursor-pointer hover:text-white" onClick={() => setSelectedCategory("all")} />
-                                                    </span>
-                                                )}
-                                                {selectedCompany !== "all" && (
-                                                    <span className="text-xs px-2 py-1 rounded-full bg-violet-500/20 text-violet-400 flex items-center gap-1">
-                                                        {getCompanyName(selectedCompany)}
-                                                        <X size={12} className="cursor-pointer hover:text-white" onClick={() => setSelectedCompany("all")} />
-                                                    </span>
-                                                )}
-                                                {(salaryRange[0] > 0 || salaryRange[1] < 200000) && (
-                                                    <span className="text-xs px-2 py-1 rounded-full bg-violet-500/20 text-violet-400 flex items-center gap-1">
-                                                        ${salaryRange[0].toLocaleString()} - ${salaryRange[1].toLocaleString()}
-                                                        <X size={12} className="cursor-pointer hover:text-white" onClick={() => setSalaryRange([0, 200000])} />
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
@@ -358,7 +437,7 @@ const JobClient = ({ initialJobs, companies }) => {
                                         <X size={20} />
                                     </button>
                                 </div>
-                                
+
                                 <div className="px-5 py-4 space-y-6">
                                     {/* Job Type */}
                                     <div>
@@ -371,7 +450,7 @@ const JobClient = ({ initialJobs, companies }) => {
                                                         name="mobileJobType"
                                                         value={type}
                                                         checked={selectedJobType === type}
-                                                        onChange={(e) => setSelectedJobType(e.target.value)}
+                                                        onChange={() => handleJobTypeChange(type)}
                                                         className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500"
                                                     />
                                                     <span className="text-sm text-gray-300">
@@ -393,7 +472,7 @@ const JobClient = ({ initialJobs, companies }) => {
                                                         name="mobileLocation"
                                                         value={loc}
                                                         checked={selectedLocation === loc}
-                                                        onChange={(e) => setSelectedLocation(e.target.value)}
+                                                        onChange={() => handleLocationChange(loc)}
                                                         className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500"
                                                     />
                                                     <span className="text-sm text-gray-300">
@@ -412,13 +491,13 @@ const JobClient = ({ initialJobs, companies }) => {
                                             min="0"
                                             max="200000"
                                             step="5000"
-                                            value={salaryRange[0]}
-                                            onChange={(e) => setSalaryRange([parseInt(e.target.value), salaryRange[1]])}
+                                            value={salaryMin}
+                                            onChange={(e) => handleSalaryChange(parseInt(e.target.value), salaryMax)}
                                             className="w-full h-1.5 rounded-lg appearance-none bg-white/20 accent-violet-500"
                                         />
                                         <div className="flex items-center justify-between text-xs text-gray-400 mt-2">
-                                            <span>${salaryRange[0].toLocaleString()}</span>
-                                            <span>${salaryRange[1].toLocaleString()}</span>
+                                            <span>${salaryMin.toLocaleString()}</span>
+                                            <span>${salaryMax.toLocaleString()}</span>
                                         </div>
                                     </div>
 
@@ -433,7 +512,7 @@ const JobClient = ({ initialJobs, companies }) => {
                                                         name="mobileCompany"
                                                         value={companyId}
                                                         checked={selectedCompany === companyId}
-                                                        onChange={(e) => setSelectedCompany(e.target.value)}
+                                                        onChange={() => handleCompanyChange(companyId)}
                                                         className="w-4 h-4 rounded-full border-white/20 bg-white/5 text-violet-500"
                                                     />
                                                     <span className="text-sm text-gray-300 truncate">
@@ -444,9 +523,8 @@ const JobClient = ({ initialJobs, companies }) => {
                                         </div>
                                     </div>
 
-                                    {/* Clear Filters Button */}
                                     {hasActiveFilters && (
-                                        <Button onPress={clearFilters} className="w-full cursor-pointer bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
+                                        <Button onPress={clearFilters} variant="light" className="w-full text-gray-300">
                                             Clear All Filters
                                         </Button>
                                     )}
@@ -457,17 +535,15 @@ const JobClient = ({ initialJobs, companies }) => {
 
                     {/* Jobs Grid */}
                     <div className="flex-1">
-                        {/* Results Count */}
-                        <div className="mb-4 flex items-center justify-between">
+                        <div className="mb-4">
                             <p className="text-sm text-gray-400">
-                                Found {filteredJobs.length} {filteredJobs.length === 1 ? "job" : "jobs"}
+                                Found {jobs.length} {jobs.length === 1 ? "job" : "jobs"}
                             </p>
                         </div>
 
-                        {/* Jobs Grid */}
-                        {filteredJobs.length > 0 ? (
+                        {jobs.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {filteredJobs.map((job) => (
+                                {jobs.map((job) => (
                                     <JobCard key={job._id} job={job} companies={companies} />
                                 ))}
                             </div>
@@ -478,11 +554,6 @@ const JobClient = ({ initialJobs, companies }) => {
                                 <p className="text-gray-400 text-center">
                                     No jobs match your search criteria. Try adjusting your filters.
                                 </p>
-                                {hasActiveFilters && (
-                                    <Button onPress={clearFilters} className="mt-4 cursor-pointer bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
-                                        Clear All Filters
-                                    </Button>
-                                )}
                             </div>
                         )}
                     </div>
