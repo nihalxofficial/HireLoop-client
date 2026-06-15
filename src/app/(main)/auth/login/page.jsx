@@ -27,7 +27,7 @@ import { FaGithub } from "react-icons/fa";
 import loginBg from "@/assets/login.png";
 import { FcGoogle } from "react-icons/fc";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 
 export default function LoginPage() {
@@ -36,6 +36,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || "/";
+
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -48,7 +51,7 @@ export default function LoginPage() {
     });
     if(data){
       toast.success("Login Successful 🎉")
-      router.push("/")
+      router.push(redirectTo)
     }
     if(error){
       toast.error(error.message)
@@ -312,7 +315,7 @@ export default function LoginPage() {
                 <p className="text-center text-xs text-gray-400 mt-1">
                   Don&apos;t have an account?{" "}
                   <Link
-                    href="/auth/signup"
+                    href={`/auth/signup?redirect=${redirectTo}`}
                     className="text-violet-400 hover:text-violet-300 font-medium"
                   >
                     Create free account

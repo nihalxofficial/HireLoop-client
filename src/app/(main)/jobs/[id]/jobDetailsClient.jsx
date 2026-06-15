@@ -180,8 +180,8 @@ const JobDetailsClient = ({ job, companies }) => {
 
                         {/* Right - Action Buttons */}
                         <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
-                            <Button className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all px-8">
-                                Apply Now
+                            <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all px-8">
+                               <Link href={`/jobs/${job._id}/apply`} >Apply Now</Link>
                             </Button>
                             <div className="flex gap-2">
                                 <Button variant="flat" className="border border-white/10 bg-white/5 text-gray-300 hover:text-white">

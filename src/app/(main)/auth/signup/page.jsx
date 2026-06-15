@@ -32,7 +32,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignupPage() {
   const [isVisible, setIsVisible] = useState(false);
@@ -42,6 +42,8 @@ export default function SignupPage() {
   const [verifyPassword, setVerifyPassword] = useState("");
   
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || "/";
 
   const handleGoogleSignup = () => {
     console.log("Google signup clicked");
@@ -74,7 +76,7 @@ export default function SignupPage() {
     
     if (data) {
       toast.success("SignUp Successful 🎉");
-      router.push("/");
+      router.push(redirectTo);
     }
     if (error) {
       toast.error(error.message);
@@ -480,7 +482,7 @@ export default function SignupPage() {
                 <p className="text-center text-xs text-gray-400 mt-1">
                   Already have an account?{" "}
                   <Link
-                    href="/auth/login"
+                    href={`/auth/login?redirect=${redirectTo}`}
                     className="text-violet-400 hover:text-violet-300 font-medium"
                   >
                     Sign in
