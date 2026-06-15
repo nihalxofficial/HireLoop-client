@@ -18,114 +18,16 @@ import {
   MessageCircle,
   Clock,
   Repeat,
-  Mail
+  Mail,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 
-const PricingClient = ({ pricingData }) => {
+const PricingClient = ({ seekerPlans, recruiterPlans }) => {
   const [activeTab, setActiveTab] = useState("seeker");
+  const [loadingPlan, setLoadingPlan] = useState(null);
 
-  // Default plans in case API returns empty data
-  const defaultSeekerPlans = [
-    {
-      name: "Free",
-      price: 0,
-      currency: "bdt",
-      interval: "forever",
-      description: "Perfect for getting started with your job search",
-      features: [
-        "Browse & save up to 10 jobs",
-        "Apply to up to 3 jobs per month",
-        "Basic profile",
-        "Email alerts",
-      ],
-      popular: false,
-      icon: "BriefcaseBusiness",
-    },
-    {
-      name: "Pro",
-      price: 1900,
-      currency: "bdt",
-      interval: "month",
-      description: "For active job seekers ready to accelerate their search",
-      features: [
-        "Apply to up to 30 jobs per month",
-        "Unlimited saved jobs",
-        "Application tracking",
-        "Salary insights",
-      ],
-      popular: true,
-      icon: "Zap",
-    },
-    {
-      name: "Premium",
-      price: 3900,
-      currency: "bdt",
-      interval: "month",
-      description: "For professionals seeking premium opportunities",
-      features: [
-        "Everything in Pro +",
-        "Unlimited applications",
-        "Profile boost to recruiters",
-        "Early access to new jobs",
-        "Priority support",
-      ],
-      popular: false,
-      icon: "Crown",
-    },
-  ];
-
-  const defaultRecruiterPlans = [
-    {
-      name: "Free",
-      price: 0,
-      currency: "bdt",
-      interval: "forever",
-      description: "Great for a company's first year of hiring",
-      features: [
-        "Up to 3 active job posts",
-        "Basic applicant management",
-        "Standard listing visibility",
-      ],
-      popular: false,
-      icon: "Users",
-    },
-    {
-      name: "Growth",
-      price: 49,
-      currency: "bdt",
-      interval: "month",
-      description: "For growing teams looking to scale their hiring",
-      features: [
-        "Up to 10 active job posts",
-        "Applicant tracking",
-        "Basic analytics",
-        "Email support",
-      ],
-      popular: true,
-      icon: "Rocket",
-    },
-    {
-      name: "Enterprise",
-      price: 149,
-      currency: "bdt",
-      interval: "month",
-      description: "For large organizations with advanced needs",
-      features: [
-        "Up to 50 active job posts",
-        "Advanced analytics dashboard",
-        "Featured job listings",
-        "Team collaboration",
-        "Custom branding",
-        "Priority support",
-      ],
-      popular: false,
-      icon: "Crown",
-    },
-  ];
-
-  // FAQ Items with icons
-  const faqItems = pricingData?.faqItems || [
+  const faqItems = [
     {
       title: "Can I cancel my subscription anytime?",
       content: "Yes, you can cancel your subscription at any time. There are no long-term contracts or cancellation fees. Your plan will remain active until the end of your current billing period.",
@@ -163,10 +65,6 @@ const PricingClient = ({ pricingData }) => {
     },
   ];
 
-  // Use API data if available, otherwise use defaults
-  const seekerPlans = pricingData?.seekerPlans || defaultSeekerPlans;
-  const recruiterPlans = pricingData?.recruiterPlans || defaultRecruiterPlans;
-
   const plans = activeTab === "seeker" ? seekerPlans : recruiterPlans;
 
   // Format price with currency symbol
@@ -191,6 +89,42 @@ const PricingClient = ({ pricingData }) => {
       Users: <Users size={20} />,
     };
     return icons[iconName] || <BriefcaseBusiness size={20} />;
+  };
+
+  // Handle Stripe Checkout
+  const handleCheckout = async (plan) => {
+    setLoadingPlan(plan.name);
+    
+    try {
+      const response = await fetch("/api/checkout_sessions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          planId: plan.id || plan.name.toLowerCase(),
+          planName: plan.name,
+          price: plan.price,
+          currency: plan.currency,
+          interval: plan.interval,
+          type: activeTab,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("Failed to create checkout session:", data.error);
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to initiate checkout. Please try again.");
+    } finally {
+      setLoadingPlan(null);
+    }
   };
 
   return (
@@ -253,7 +187,7 @@ const PricingClient = ({ pricingData }) => {
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <div className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-3 py-1 text-[10px] font-medium text-white shadow-lg shadow-violet-500/30">
+                  <div className="rounded-full bg-linear-to-r from-fuchsia-500 to-violet-600 px-3 py-1 text-[10px] font-medium text-white shadow-lg shadow-violet-500/30">
                     MOST POPULAR
                   </div>
                 </div>
@@ -307,18 +241,33 @@ const PricingClient = ({ pricingData }) => {
                       <ArrowRight size={14} />
                     </Button>
                   </Link>
-                ) : (
-                  <Link href={plan.price === 0 ? "/auth/signup" : `/auth/signup?plan=${plan.name.toLowerCase()}`}>
-                    <Button
-                      className={`w-full transition-all duration-300 ${
-                        plan.popular
-                          ? "bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02]"
-                          : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
-                      }`}
-                    >
-                      {plan.price === 0 ? "Get Started" : `Choose ${plan.name}`}
+                ) : plan.price === 0 ? (
+                  <Link href="/auth/signup">
+                    <Button className="w-full border border-white/10 bg-white/5 text-white hover:bg-white/10 transition-all duration-300">
+                      Get Started
                     </Button>
                   </Link>
+                ) : (
+                  <form action="/api/checkout_sessions" method="POST" className="w-full">
+                    <input type="hidden" name="planId" value={plan.id || plan.name.toLowerCase()} />
+                    <input type="hidden" name="planName" value={plan.name} />
+                    <input type="hidden" name="price" value={plan.price} />
+                    <input type="hidden" name="currency" value={plan.currency} />
+                    <input type="hidden" name="interval" value={plan.interval} />
+                    <input type="hidden" name="type" value={activeTab} />
+                    
+                    <Button
+                      type="submit"
+                      className={`w-full transition-all duration-300 ${
+                        plan.popular
+                          ? "bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02]"
+                          : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                      }`}
+                      isLoading={loadingPlan === plan.name}
+                    >
+                      {loadingPlan === plan.name ? "Processing..." : `Choose ${plan.name}`}
+                    </Button>
+                  </form>
                 )}
               </div>
             </div>
@@ -336,7 +285,7 @@ const PricingClient = ({ pricingData }) => {
               <div className="h-1.5 w-1.5 rounded-full bg-orange-400" />
             </div>
             <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
-              Got Questions? We've Got Answers
+              Got Questions? We&apos;ve Got Answers
             </h2>
             <p className="text-gray-400 mt-2">
               Everything you need to know about our pricing and plans
