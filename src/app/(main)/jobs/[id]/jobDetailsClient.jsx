@@ -202,7 +202,7 @@ const JobDetailsClient = ({ job, companies }) => {
                     {/* Left Column - Main Content */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Job Description Card */}
-                        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6">
+                        {/* <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6">
                             <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                                 <BriefcaseBusiness size={20} className="text-violet-400" />
                                 Job Description
@@ -210,7 +210,7 @@ const JobDetailsClient = ({ job, companies }) => {
                             <p className="text-gray-300 leading-relaxed">
                                 {job.description || "No description provided."}
                             </p>
-                        </div>
+                        </div> */}
 
                         {/* Responsibilities Card */}
                         <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6">

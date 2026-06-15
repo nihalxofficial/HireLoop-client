@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { createApplication } from "@/lib/actions/applications";
 
 const JobApplyForm = ({ job, user, company }) => {
     const router = useRouter();
@@ -133,15 +134,15 @@ const JobApplyForm = ({ job, user, company }) => {
             recruiterId: job.recruiterId,
             ...formData,
             cv: uploadedCV,
-            appliedAt: new Date().toISOString(),
-            status: "pending"
+            appliedAt: new Date(),
         };
 
-        console.log("Application submitted:", applicationData);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        toast.success("Application submitted successfully!");
-        router.push(`/jobs/${job._id}`);
+        const result = await createApplication(applicationData);
+        console.log(result);
+        if(result.insertedId){
+            toast.success("Application submitted successfully!");
+            router.push(`/jobs/${job._id}`);
+        }
         setIsSubmitting(false);
     };
 
