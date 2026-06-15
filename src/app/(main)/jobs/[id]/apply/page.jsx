@@ -11,81 +11,86 @@ import { getApplicationsByApplicant } from '@/lib/api/applications';
 
 // Pricing configuration - easily replaceable with API call
 const getPricingPlans = () => {
-  return {
-    free: {
-      id: "free",
-      name: "Free",
-      price: 0,
-      priceDisplay: "$0",
-      billingPeriod: "forever",
-      applicationsPerMonth: 3,
-      maxSavedJobs: 10,
-      features: [
-        "Browse and save up to 10 jobs",
-        "Apply to up to 3 jobs per month",
-        "Basic profile",
-        "Email alerts"
-      ],
-      badge: null,
-      popular: false
-    },
-    pro: {
-      id: "pro",
-      name: "Pro",
-      price: 19,
-      priceDisplay: "$19",
-      billingPeriod: "month",
-      applicationsPerMonth: 30,
-      maxSavedJobs: "unlimited",
-      features: [
-        "Apply to up to 30 jobs per month",
-        "Unlimited saved jobs",
-        "Application tracking",
-        "Salary insights"
-      ],
-      badge: "Most Popular",
-      popular: true
-    },
-    premium: {
-      id: "premium",
-      name: "Premium",
-      price: 39,
-      priceDisplay: "$39",
-      billingPeriod: "month",
-      applicationsPerMonth: "unlimited",
-      maxSavedJobs: "unlimited",
-      features: [
-        "Everything in Pro +",
-        "Unlimited applications",
-        "Profile boost to recruiters",
-        "Early access to new jobs",
-        "Priority support"
-      ],
-      badge: "Best Value",
-      popular: false
-    }
-  };
+    return {
+        free: {
+            id: "free",
+            name: "Free",
+            price: 0,
+            priceDisplay: "$0",
+            billingPeriod: "forever",
+            applicationsPerMonth: 3,
+            maxSavedJobs: 10,
+            features: [
+                "Browse and save up to 10 jobs",
+                "Apply to up to 3 jobs per month",
+                "Basic profile",
+                "Email alerts"
+            ],
+            badge: null,
+            popular: false
+        },
+        pro: {
+            id: "pro",
+            name: "Pro",
+            price: 19,
+            priceDisplay: "$19",
+            billingPeriod: "month",
+            applicationsPerMonth: 30,
+            maxSavedJobs: "unlimited",
+            features: [
+                "Apply to up to 30 jobs per month",
+                "Unlimited saved jobs",
+                "Application tracking",
+                "Salary insights"
+            ],
+            badge: "Most Popular",
+            popular: true
+        },
+        premium: {
+            id: "premium",
+            name: "Premium",
+            price: 39,
+            priceDisplay: "$39",
+            billingPeriod: "month",
+            applicationsPerMonth: "unlimited",
+            maxSavedJobs: "unlimited",
+            features: [
+                "Everything in Pro +",
+                "Unlimited applications",
+                "Profile boost to recruiters",
+                "Early access to new jobs",
+                "Priority support"
+            ],
+            badge: "Best Value",
+            popular: false
+        }
+    };
 };
 
 // Function to get user's current plan (can be replaced with API call)
 const getUserCurrentPlan = async (userId, applicationsCount) => {
-  // This can be replaced with database query
-  // For now, return free plan with usage data
-  const plans = getPricingPlans();
-  const currentPlanId = "free"; // This would come from user's subscription in DB
-  
-  const currentPlan = plans[currentPlanId];
-  
-  return {
-    ...currentPlan,
-    usedApplications: applicationsCount,
-    remainingApplications: currentPlan.applicationsPerMonth === "unlimited" 
-      ? "unlimited" 
-      : Math.max(0, currentPlan.applicationsPerMonth - applicationsCount),
-    usagePercentage: currentPlan.applicationsPerMonth === "unlimited"
-      ? 0
-      : (applicationsCount / currentPlan.applicationsPerMonth) * 100
-  };
+    // This can be replaced with database query
+    // For now, return free plan with usage data
+    const plans = getPricingPlans();
+    const currentPlanId = "free"; // This would come from user's subscription in DB
+
+    const currentPlan = plans[currentPlanId];
+
+    return {
+        ...currentPlan,
+        usedApplications: applicationsCount,
+        remainingApplications: currentPlan.applicationsPerMonth === "unlimited"
+            ? "unlimited"
+            : Math.max(0, currentPlan.applicationsPerMonth - applicationsCount),
+        usagePercentage: currentPlan.applicationsPerMonth === "unlimited"
+            ? 0
+            : (applicationsCount / currentPlan.applicationsPerMonth) * 100
+    };
+};
+
+// Function to check if user has already applied for this job
+const hasUserAppliedForJob = (applications, jobId) => {
+    return applications.some(app => app.JobId === jobId || app.jobId === jobId);
 };
 
 const ApplyPage = async ({ params }) => {
@@ -96,7 +101,7 @@ const ApplyPage = async ({ params }) => {
     }
 
     const applications = await getApplicationsByApplicant(user.id);
-    
+
     if (user.role !== "seeker") {
         return (
             <div className="flex justify-center items-center min-h-screen pt-20">
@@ -115,7 +120,7 @@ const ApplyPage = async ({ params }) => {
             </div>
         );
     }
-    
+
     const job = await getJobById(id);
     if (!job) {
         return (
@@ -131,33 +136,131 @@ const ApplyPage = async ({ params }) => {
         );
     }
 
+    // Check if user has already applied for this job
+    const alreadyApplied = hasUserAppliedForJob(applications, id);
+
+    if (alreadyApplied) {
+        return (
+            <AlreadyAppliedPage job={job} />
+        );
+    }
+
     const company = await getCompanyById(job.companyId);
     const currentPlan = await getUserCurrentPlan(user.id, applications.length);
     const allPlans = getPricingPlans();
-    
-    const hasReachedLimit = currentPlan.applicationsPerMonth !== "unlimited" && 
-                           applications.length >= currentPlan.applicationsPerMonth;
+
+    const hasReachedLimit = currentPlan.applicationsPerMonth !== "unlimited" &&
+        applications.length >= currentPlan.applicationsPerMonth;
 
     return (
         <>
-            {!hasReachedLimit ? 
-                <JobApplyForm 
-                    job={job} 
-                    user={user} 
-                    company={company} 
-                    applications={applications} 
+            {!hasReachedLimit ?
+                <JobApplyForm
+                    job={job}
+                    user={user}
+                    company={company}
+                    applications={applications}
                     currentPlan={currentPlan}
                     allPlans={allPlans}
                 />
-                : 
-                <OutOfLimitPage 
-                    currentPlan={currentPlan} 
-                    allPlans={allPlans} 
+                :
+                <OutOfLimitPage
+                    currentPlan={currentPlan}
+                    allPlans={allPlans}
                     applications={applications}
                     jobId={job._id}
                 />
             }
         </>
+    );
+};
+
+// Already Applied Component
+const AlreadyAppliedPage = ({ job }) => {
+    return (
+        <div className="pt-20 pb-10">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
+                    {/* Header */}
+                    <div className="p-6 border-b border-white/10 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-semibold text-white">Already Applied</h1>
+                                <p className="text-gray-400 mt-1">
+                                    You have already submitted an application for this position
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6 space-y-6">
+                        <div className="text-center py-6">
+                            <div className="w-20 h-20 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-lg font-semibold text-white mb-2">{job.title}</h3>
+                            <p className="text-gray-400 mb-6">
+                                You've already submitted an application for this job position.
+                                You can check the status of your application in your dashboard.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white">
+                                    <Link href={`/jobs/${job._id}`}>
+                                        View Job Details
+                                    </Link>
+                                </Button>
+                                <Button variant="bordered" className="border-white/20 text-white hover:bg-white/5">
+                                    <Link href="/dashboard/applications">
+                                        View My Applications
+                                    </Link>
+                                </Button>
+                                <Button variant="light" className="text-gray-300 hover:text-white">
+                                    <Link href="/jobs">
+                                        Browse Other Jobs
+                                    </Link>
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Tips Section */}
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                            <h4 className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+                                <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                What's Next?
+                            </h4>
+                            <ul className="space-y-2 text-sm text-gray-400">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-violet-400">•</span>
+                                    <span>The employer will review your application</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-violet-400">•</span>
+                                    <span>You'll receive notifications when your application status changes</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-violet-400">•</span>
+                                    <span>Check your dashboard regularly for updates</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-violet-400">•</span>
+                                    <span>Keep your profile updated to increase your chances</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
@@ -202,11 +305,11 @@ const OutOfLimitPage = ({ currentPlan, allPlans, applications, jobId }) => {
                                     <div className="text-xs text-gray-500">remaining</div>
                                 </div>
                             </div>
-                            
+
                             {currentPlan.applicationsPerMonth !== "unlimited" && (
                                 <>
                                     <div className="w-full bg-white/10 rounded-full h-2 mb-4">
-                                        <div 
+                                        <div
                                             className="bg-gradient-to-r from-fuchsia-500 to-violet-600 h-2 rounded-full transition-all duration-500"
                                             style={{ width: `${currentPlan.usagePercentage}%` }}
                                         />
@@ -230,21 +333,21 @@ const OutOfLimitPage = ({ currentPlan, allPlans, applications, jobId }) => {
 
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
-                            <Link href="/pricing" className="flex-1">
-                                <Button className="w-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20">
+                            <Button className="w-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20">
+                                <Link href="/pricing" className="flex-1">
                                     View All Plans & Pricing
-                                </Button>
-                            </Link>
-                            <Link href="/jobs" className="flex-1">
-                                <Button variant="bordered" className="w-full border-white/20 text-white hover:bg-white/5">
+                                </Link>
+                            </Button>
+                            <Button variant="bordered" className="w-full border-white/20 text-white hover:bg-white/5">
+                                <Link href="/jobs" className="flex-1">
                                     Browse More Jobs
-                                </Button>
-                            </Link>
-                            <Link href="/dashboard/applications" className="flex-1">
-                                <Button variant="light" className="w-full text-gray-300 hover:text-white">
+                                </Link>
+                            </Button>
+                            <Button variant="light" className="w-full text-gray-300 hover:text-white">
+                                <Link href="/dashboard/applications" className="flex-1">
                                     View My Applications
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -256,11 +359,10 @@ const OutOfLimitPage = ({ currentPlan, allPlans, applications, jobId }) => {
 // Plan Card Component
 const PlanCard = ({ plan, isCurrentPlan }) => {
     return (
-        <div className={`rounded-xl p-5 transition-all relative overflow-hidden ${
-            plan.popular 
-                ? 'border-2 border-violet-500 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10' 
+        <div className={`rounded-xl p-5 transition-all relative overflow-hidden ${plan.popular
+                ? 'border-2 border-violet-500 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
                 : 'border border-white/10 bg-white/5 hover:border-violet-500/30'
-        }`}>
+            }`}>
             {plan.badge && (
                 <div className="absolute top-0 right-0">
                     <div className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
@@ -268,7 +370,7 @@ const PlanCard = ({ plan, isCurrentPlan }) => {
                     </div>
                 </div>
             )}
-            
+
             <div className="mb-4">
                 <h4 className="text-lg font-semibold text-white">{plan.name}</h4>
                 <div className="mt-2">
@@ -277,15 +379,12 @@ const PlanCard = ({ plan, isCurrentPlan }) => {
                         <span className="text-gray-400 text-sm">/{plan.billingPeriod}</span>
                     )}
                 </div>
-                {/* {plan.billingPeriod === "forever" && (
-                    <p className="text-xs text-gray-500 mt-1">One-time payment</p>
-                )} */}
             </div>
-            
+
             <div className="mb-4">
                 <div className="text-sm text-emerald-400 mb-2">
-                    {plan.applicationsPerMonth === "unlimited" 
-                        ? "♾️ Unlimited applications" 
+                    {plan.applicationsPerMonth === "unlimited"
+                        ? "♾️ Unlimited applications"
                         : `📄 ${plan.applicationsPerMonth} applications/month`}
                 </div>
                 <ul className="space-y-2">
@@ -302,13 +401,12 @@ const PlanCard = ({ plan, isCurrentPlan }) => {
                     <p className="text-xs text-gray-500 mt-2">+{plan.features.length - 3} more features</p>
                 )}
             </div>
-            
-            <Button 
-                className={`w-full ${
-                    isCurrentPlan 
-                        ? 'bg-white/10 text-white border border-white/20 cursor-default' 
+
+            <Button
+                className={`w-full ${isCurrentPlan
+                        ? 'bg-white/10 text-white border border-white/20 cursor-default'
                         : 'bg-linear-to-r from-fuchsia-500 to-violet-600 text-white hover:scale-[1.02] transition-all'
-                }`}
+                    }`}
                 disabled={isCurrentPlan}
             >
                 {isCurrentPlan ? 'Current Plan' : `Upgrade to ${plan.name}`}
