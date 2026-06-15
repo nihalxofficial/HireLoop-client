@@ -3,16 +3,34 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import { LayoutDashboard, Menu, Settings, X, LogOut, ChevronDown } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  Menu, 
+  Settings, 
+  X, 
+  LogOut, 
+  ChevronDown,
+  Home,
+  Briefcase,
+  Building2,
+  CreditCard,
+  Info,
+  Mail,
+  UserCircle
+} from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { name: "Browse Jobs", href: "/jobs" },
-  { name: "Companies", href: "/companies" },
-  { name: "Pricing", href: "/pricing" },
+  { name: "Home", href: "/", icon: Home },
+  { name: "Jobs", href: "/jobs", icon: Briefcase },
+  { name: "Companies", href: "/companies", icon: Building2 },
+  { name: "Pricing", href: "/pricing", icon: CreditCard },
+  // { name: "About", href: "/about", icon: Info },
+  { name: "Contact", href: "/contact", icon: Mail },
 ];
 
 export default function Navbar() {
@@ -21,18 +39,15 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
-  // console.log(user);
-
+  const pathname = usePathname();
   const router = useRouter();
 
   const handleProfileClick = () => {
-    // Close mobile menu if open
     if (isOpen) setIsOpen(false);
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleMenuClick = () => {
-    // Close profile dropdown if open
     if (isDropdownOpen) setIsDropdownOpen(false);
     setIsOpen(!isOpen);
   };
@@ -55,7 +70,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownRef]);
 
-  // Close mobile menu on window resize (when switching to desktop)
+  // Close mobile menu on window resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
@@ -67,6 +82,14 @@ export default function Navbar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Function to check if link is active
+  const isActive = (href) => {
+    if (href === "/") {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  };
+
   return (
     <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#050816]/80 backdrop-blur-xl text-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -75,25 +98,34 @@ export default function Navbar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-fuchsia-500 to-violet-600 shadow-lg shadow-violet-500/30 transition-transform group-hover:scale-105">
             <span className="text-sm font-bold">HL</span>
           </div>
-          <div className="leading-tight">
+          <div className="leading-tight hidden sm:block">
             <h1 className="text-sm font-semibold">HireLoop</h1>
             <p className="text-xs text-gray-400">Find Career Opportunities</p>
           </div>
         </Link>
 
-        {/* Desktop Combined Container - Hidden on mobile */}
+        {/* Desktop Combined Container */}
         <div className="hidden items-center rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-xl lg:flex">
           {/* Nav Links */}
-          <div className="flex items-center gap-6 px-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-sm text-gray-300 transition-all duration-300 hover:text-white hover:scale-105"
-              >
-                {link.name}
-              </Link>
-            ))}
+          <div className="flex items-center gap-1 px-3">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-all duration-300 ${
+                    active
+                      ? "bg-gradient-to-r from-fuchsia-500/20 to-violet-600/20 text-white"
+                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <Icon size={16} className={active ? "text-violet-400" : "text-gray-400"} />
+                  <span>{link.name}</span>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Divider */}
@@ -106,7 +138,7 @@ export default function Navbar() {
               <div className="h-4 w-20 rounded bg-white/10 animate-pulse" />
             </div>
           ) : user ? (
-            // User Dropdown - Desktop only
+            // User Dropdown - Desktop
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={handleProfileClick}
@@ -126,7 +158,7 @@ export default function Navbar() {
                   <p className="text-sm font-semibold text-white truncate max-w-28">
                     {user?.name?.split(" ")[0] || user?.name || "User"}
                   </p>
-                  <p className="text-[10px] text-gray-400">Member</p>
+                  <p className="text-[10px] text-gray-400 capitalize">{user?.role}</p>
                 </div>
                 <ChevronDown 
                   size={14} 
@@ -134,7 +166,7 @@ export default function Navbar() {
                 />
               </button>
 
-              {/* Dropdown Menu - Desktop only */}
+              {/* Dropdown Menu - Desktop */}
               <AnimatePresence>
                 {isDropdownOpen && (
                   <motion.div
@@ -164,6 +196,9 @@ export default function Navbar() {
                           <p className="text-xs text-gray-400 truncate max-w-48">
                             {user?.email}
                           </p>
+                          <p className="text-xs text-violet-400 mt-1 capitalize">
+                            {user?.role}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -186,6 +221,14 @@ export default function Navbar() {
                         <Settings size={16} className="text-violet-400" />
                         Settings
                       </Link>
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <UserCircle size={16} className="text-violet-400" />
+                        My Profile
+                      </Link>
                     </div>
 
                     {/* Sign Out */}
@@ -203,7 +246,7 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
           ) : (
-            // Auth Buttons for Logged Out Users - Desktop only
+            // Auth Buttons for Logged Out Users - Desktop
             <div className="flex items-center gap-1">
               <Link
                 href="/auth/login"
@@ -273,6 +316,9 @@ export default function Navbar() {
                           <p className="text-xs text-gray-400 truncate max-w-40">
                             {user?.email}
                           </p>
+                          <p className="text-xs text-violet-400 mt-0.5 capitalize">
+                            {user?.role}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -300,6 +346,17 @@ export default function Navbar() {
                       >
                         <Settings size={16} className="text-violet-400" />
                         Settings
+                      </Link>
+                      <Link
+                        href="/profile"
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          setIsOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <UserCircle size={16} className="text-violet-400" />
+                        My Profile
                       </Link>
                     </div>
 
@@ -359,17 +416,26 @@ export default function Navbar() {
           >
             <div className="px-4 py-4">
               {/* Mobile Navigation Links */}
-              <div className="flex flex-col gap-2">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className="rounded-lg px-3 py-3 text-gray-300 transition-all duration-300 hover:bg-white/10 hover:text-white"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
+              <div className="flex flex-col gap-1">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  const active = isActive(link.href);
+                  return (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-3 transition-all duration-300 ${
+                        active
+                          ? "bg-gradient-to-r from-fuchsia-500/20 to-violet-600/20 text-white"
+                          : "text-gray-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <Icon size={18} className={active ? "text-violet-400" : "text-gray-400"} />
+                      <span className="text-sm font-medium">{link.name}</span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
