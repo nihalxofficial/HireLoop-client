@@ -1,4 +1,4 @@
-// app/jobs/[id]/apply/jobApplyForm.jsx
+// app/jobs/[id]/apply/JobApplyForm.jsx
 "use client";
 
 import React, { useState, useRef } from "react";
@@ -10,20 +10,23 @@ import {
     MapPin,
     DollarSign,
     Calendar,
-    Clock,
     Upload,
     X,
     FileText,
     Send,
     Loader2,
-    CheckCircle
+    CheckCircle,
+    TrendingUp,
+    Zap,
+    Crown,
+    Sparkles
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { createApplication } from "@/lib/actions/applications";
 
-const JobApplyForm = ({ job, user, company }) => {
+const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans }) => {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [uploadedCV, setUploadedCV] = useState(null);
@@ -50,25 +53,19 @@ const JobApplyForm = ({ job, user, company }) => {
     const handleCVUpload = async (file) => {
         if (!file) return;
 
-        // Check file type
         const allowedTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
         if (!allowedTypes.includes(file.type)) {
             toast.error("Please upload PDF, DOC, or DOCX file");
             return;
         }
 
-        // Check file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
             toast.error("File size must be less than 5MB");
             return;
         }
 
         setUploadingCV(true);
-
-        // TODO: Upload to your server or cloud storage
-        // For now, simulate upload
         await new Promise(resolve => setTimeout(resolve, 1000));
-
         setUploadedCV({
             name: file.name,
             size: file.size,
@@ -126,19 +123,17 @@ const JobApplyForm = ({ job, user, company }) => {
 
         setIsSubmitting(true);
 
-        // TODO: Submit application to your API
         const applicationData = {
             jobTitle: job.title,
-            ApplicantId: user.id,
+            JobId: job._id,
+            applicantId: user.id,
             companyId: job.companyId,
             recruiterId: job.recruiterId,
             ...formData,
             cv: uploadedCV,
-            appliedAt: new Date(),
         };
 
         const result = await createApplication(applicationData);
-        console.log(result);
         if(result.insertedId){
             toast.success("Application submitted successfully!");
             router.push(`/jobs/${job._id}`);
@@ -159,6 +154,25 @@ const JobApplyForm = ({ job, user, company }) => {
         inputWrapper: "border-white/10 bg-white/5 hover:border-violet-500/50 focus-within:border-violet-500 data-[hover=true]:border-white/20 rounded-xl",
     };
 
+    const getPlanIcon = () => {
+        switch(currentPlan.id) {
+            case 'pro':
+                return <Zap size={16} className="text-violet-400" />;
+            case 'premium':
+                return <Crown size={16} className="text-amber-400" />;
+            default:
+                return <Sparkles size={16} className="text-emerald-400" />;
+        }
+    };
+
+    const remainingApps = currentPlan.applicationsPerMonth === "unlimited" 
+        ? "unlimited" 
+        : currentPlan.applicationsPerMonth - applications.length;
+    
+    const usagePercentage = currentPlan.applicationsPerMonth === "unlimited"
+        ? 0
+        : (applications.length / currentPlan.applicationsPerMonth) * 100;
+
     return (
         <div className="pt-20 pb-10">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,18 +184,18 @@ const JobApplyForm = ({ job, user, company }) => {
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Column - Job Summary */}
+                    {/* Left Column - Job Summary & Plan Info */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-24 space-y-5">
                             {/* Job Info Card */}
                             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-600 flex items-center justify-center">
+                                    <div className="w-12 h-12 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 flex items-center justify-center">
                                         <BriefcaseBusiness size={20} className="text-white" />
                                     </div>
                                     <div>
                                         <h2 className="text-white font-semibold">Job Summary</h2>
-                                        <p className="text-xs text-gray-400">You're applying for</p>
+                                        <p className="text-xs text-gray-400">You&apos;re applying for</p>
                                     </div>
                                 </div>
 
@@ -191,8 +205,6 @@ const JobApplyForm = ({ job, user, company }) => {
                                     <div className="flex items-center gap-2 text-gray-400">
                                         <Building2 size={14} className="text-violet-400" />
                                         <span><Link href={`/companies/${company?._id}`}>{company?.name || "Company"}</Link></span>
-                                        
-                                        
                                     </div>
                                     <div className="flex items-center gap-2 text-gray-400">
                                         <MapPin size={14} className="text-violet-400" />
@@ -209,7 +221,85 @@ const JobApplyForm = ({ job, user, company }) => {
                                 </div>
                             </div>
 
-                            {/* Tips Card */}
+                            {/* Plan Usage Card */}
+                            <div className={`rounded-2xl border backdrop-blur-sm p-5 ${
+                                currentPlan.id === 'premium' 
+                                    ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10'
+                                    : currentPlan.id === 'pro'
+                                    ? 'border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
+                                    : 'border-white/10 bg-white/5'
+                            }`}>
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                        {getPlanIcon()}
+                                        <h3 className="text-sm font-semibold text-white">Current Plan: {currentPlan.name}</h3>
+                                    </div>
+                                    {currentPlan.badge && (
+                                        <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
+                                            {currentPlan.badge}
+                                        </span>
+                                    )}
+                                </div>
+                                
+                                <div className="mb-3">
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <span className="text-gray-300">Applications this month</span>
+                                        <span className="text-white font-semibold">
+                                            {applications.length} / {currentPlan.applicationsPerMonth === "unlimited" ? "∞" : currentPlan.applicationsPerMonth}
+                                        </span>
+                                    </div>
+                                    {currentPlan.applicationsPerMonth !== "unlimited" && (
+                                        <div className="w-full bg-white/10 rounded-full h-2">
+                                            <div 
+                                                className="bg-gradient-to-r from-fuchsia-500 to-violet-600 h-2 rounded-full transition-all duration-500"
+                                                style={{ width: `${usagePercentage}%` }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-xs text-gray-400">Applications remaining</span>
+                                    <span className="text-2xl font-bold text-violet-400">
+                                        {remainingApps === "unlimited" ? "∞" : remainingApps}
+                                    </span>
+                                </div>
+
+                                {currentPlan.id === "free" && remainingApps <= 1 && remainingApps !== "unlimited" && (
+                                    <div className="mb-4 p-2 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                                        <p className="text-xs text-orange-400 text-center">
+                                            ⚠️ Only {remainingApps} application{remainingApps !== 1 ? 's' : ''} left this month!
+                                        </p>
+                                    </div>
+                                )}
+
+                                {currentPlan.id !== "premium" && (
+                                    <Link href="/pricing">
+                                        <Button size="sm" className="w-full bg-white/10 text-white hover:bg-white/20 border border-white/20">
+                                            <Zap size={14} />
+                                            Upgrade to {currentPlan.id === "free" ? "Pro" : "Premium"}
+                                        </Button>
+                                    </Link>
+                                )}
+                            </div>
+
+                            {/* Plan Features Card */}
+                            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <CheckCircle size={16} className="text-emerald-400" />
+                                    <h3 className="text-sm font-semibold text-white">{currentPlan.name} Plan Features</h3>
+                                </div>
+                                <ul className="space-y-2">
+                                    {currentPlan.features.map((feature, idx) => (
+                                        <li key={idx} className="flex items-start gap-2 text-xs text-gray-400">
+                                            <CheckCircle size={12} className="text-emerald-400 mt-0.5 shrink-0" />
+                                            <span>{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Application Tips Card */}
                             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
                                 <h4 className="text-sm font-semibold text-white mb-3">Application Tips</h4>
                                 <ul className="space-y-2 text-xs text-gray-400">
@@ -449,7 +539,7 @@ const JobApplyForm = ({ job, user, company }) => {
                                     <Button
                                         type="submit"
                                         isLoading={isSubmitting}
-                                        className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all"
+                                        className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all"
                                     >
                                         <Send size={16} />
                                         Submit Application

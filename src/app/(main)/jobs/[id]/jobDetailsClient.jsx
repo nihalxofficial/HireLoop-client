@@ -94,7 +94,7 @@ const JobDetailsClient = ({ job, companies }) => {
                         <BriefcaseBusiness size={48} className="text-gray-600 mb-4" />
                         <h2 className="text-xl font-semibold text-white mb-2">Job Not Found</h2>
                         <p className="text-gray-400 text-center">
-                            The job you're looking for doesn't exist or has been removed.
+                            The job you&apos;re looking for doesn&apos;t exist or has been removed.
                         </p>
                         <Link href="/jobs">
                             <Button className="mt-4 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
@@ -166,7 +166,7 @@ const JobDetailsClient = ({ job, companies }) => {
                                     <span className="text-sm text-gray-300">{job.category}</span>
                                 </div>
                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                                    <DollarSign size={14} className="text-emerald-400" />
+                                    {/* <DollarSign size={14} className="text-emerald-400" /> */}
                                     <span className="text-sm text-emerald-400 font-medium">
                                         {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
                                     </span>
