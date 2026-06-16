@@ -95,7 +95,7 @@ const CheckoutSuccessClient = ({ sessionData, user }) => {
                         <div className="absolute top-4 right-4">
                             <Sparkles size={20} className="text-violet-400 animate-pulse" />
                         </div>
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 flex items-center justify-center mx-auto mb-4 ring-4 ring-emerald-500/20">
+                        <div className="w-20 h-20 rounded-full bg-linear-to-r from-emerald-500/20 to-emerald-600/20 flex items-center justify-center mx-auto mb-4 ring-4 ring-emerald-500/20">
                             <CheckCircle size={48} className="text-emerald-400" />
                         </div>
                         <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight mb-2">
@@ -163,7 +163,7 @@ const CheckoutSuccessClient = ({ sessionData, user }) => {
 
                     {/* What's Next Section */}
                     <div className="px-6 pb-6">
-                        <h2 className="text-lg font-semibold text-white mb-4">What's Next?</h2>
+                        <h2 className="text-lg font-semibold text-white mb-4">What&apos;s Next?</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <Link href={dashboardPath} className="group">
                                 <div className="rounded-xl bg-white/5 border border-white/10 p-4 text-center hover:border-violet-500/50 hover:bg-white/10 transition-all duration-300">

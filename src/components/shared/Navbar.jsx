@@ -117,7 +117,7 @@ export default function Navbar() {
                   href={link.href}
                   className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-all duration-300 ${
                     active
-                      ? "bg-gradient-to-r from-fuchsia-500/20 to-violet-600/20 text-white"
+                      ? "bg-linear-to-r from-fuchsia-500/20 to-violet-600/20 text-white"
                       : "text-gray-300 hover:bg-white/10 hover:text-white"
                   }`}
                 >
@@ -214,7 +214,7 @@ export default function Navbar() {
                         Dashboard
                       </Link>
                       <Link
-                        href="/dashboard/settings"
+                        href={`/dashboard/${user?.role}/settings`}
                         onClick={() => setIsDropdownOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                       >
@@ -222,7 +222,7 @@ export default function Navbar() {
                         Settings
                       </Link>
                       <Link
-                        href="/profile"
+                        href={`/dashboard/${user?.role}/profile"`}
                         onClick={() => setIsDropdownOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                       >
@@ -337,7 +337,7 @@ export default function Navbar() {
                         Dashboard
                       </Link>
                       <Link
-                        href="/dashboard/settings"
+                        href={`/dashboard/${user?.role}/settings`}
                         onClick={() => {
                           setIsDropdownOpen(false);
                           setIsOpen(false);
@@ -348,7 +348,7 @@ export default function Navbar() {
                         Settings
                       </Link>
                       <Link
-                        href="/profile"
+                        href={`/dashboard/${user?.role}/profile`}
                         onClick={() => {
                           setIsDropdownOpen(false);
                           setIsOpen(false);
@@ -427,7 +427,7 @@ export default function Navbar() {
                       onClick={() => setIsOpen(false)}
                       className={`flex items-center gap-3 rounded-lg px-3 py-3 transition-all duration-300 ${
                         active
-                          ? "bg-gradient-to-r from-fuchsia-500/20 to-violet-600/20 text-white"
+                          ? "bg-linear-to-r from-fuchsia-500/20 to-violet-600/20 text-white"
                           : "text-gray-300 hover:bg-white/10 hover:text-white"
                       }`}
                     >
