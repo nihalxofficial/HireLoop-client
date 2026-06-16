@@ -8,6 +8,6 @@ export const getRecruiterPlans = async()=>{
     return serverFetch("/pricing/recruiter")
 }
 
-export const getFaqItems = async()=>{
-    return serverFetch("/pricing/faq")
-}
+// export const getFaqItems = async()=>{
+//     return serverFetch("/pricing/faq")
+// }

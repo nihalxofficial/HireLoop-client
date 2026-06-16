@@ -155,7 +155,7 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
               onClick={() => setActiveTab("seeker")}
               className={`px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
                 activeTab === "seeker"
-                  ? "bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/30"
+                  ? "bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/30"
                   : "text-gray-400 hover:text-white"
               }`}
             >
@@ -165,7 +165,7 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
               onClick={() => setActiveTab("recruiter")}
               className={`px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
                 activeTab === "recruiter"
-                  ? "bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/30"
+                  ? "bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/30"
                   : "text-gray-400 hover:text-white"
               }`}
             >
@@ -181,7 +181,7 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
               key={plan.name}
               className={`relative rounded-2xl border backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] ${
                 plan.popular
-                  ? "border-violet-500/50 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/5 shadow-2xl shadow-violet-500/10"
+                  ? "border-violet-500/50 bg-linear-to-br from-violet-500/10 to-fuchsia-500/5 shadow-2xl shadow-violet-500/10"
                   : "border-white/10 bg-white/5 hover:border-violet-500/30"
               }`}
             >
@@ -196,7 +196,7 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
                 {/* Plan Icon */}
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
                   plan.popular 
-                    ? "bg-gradient-to-r from-fuchsia-500 to-violet-600" 
+                    ? "bg-linear-to-r from-fuchsia-500 to-violet-600" 
                     : "bg-white/10 border border-white/10"
                 }`}>
                   <div className={plan.popular ? "text-white" : "text-violet-400"}>

@@ -29,7 +29,7 @@ const AccessDenied = ({ jobId }) => (
             </div>
             <h2 className="text-xl font-semibold text-white mb-2">Access Denied</h2>
             <p className="text-gray-400 mb-6">Only job seekers can apply for positions. Please sign in with a job seeker account.</p>
-            <Button className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
+            <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white">
                 <Link href={`/auth/login?redirect=/jobs/${jobId}/apply`}>Login as Job Seeker</Link>
             </Button>
         </div>
@@ -42,7 +42,7 @@ const JobNotFound = () => (
             <h2 className="text-xl font-semibold text-white mb-2">Job Not Found</h2>
             <p className="text-gray-400">The job you&apos;re looking for doesn&apos;t exist.</p>
             <Link href="/jobs">
-                <Button className="mt-4 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">Browse Jobs</Button>
+                <Button className="mt-4 bg-linear-to-r from-fuchsia-500 to-violet-600 text-white">Browse Jobs</Button>
             </Link>
         </div>
     </div>
@@ -52,7 +52,7 @@ const AlreadyAppliedPage = ({ job }) => (
     <div className="pt-20 pb-10">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
-                <div className="p-6 border-b border-white/10 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+                <div className="p-6 border-b border-white/10 bg-linear-to-r from-blue-500/10 to-cyan-500/10">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
                             <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@ const AlreadyAppliedPage = ({ job }) => (
                             You can check the status of your application in your dashboard.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                            <Button className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
+                            <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white">
                                 <Link href={`/jobs/${job._id}`}>View Job Details</Link>
                             </Button>
                             <Button variant="bordered" className="border-white/20 text-white hover:bg-white/5">
@@ -115,12 +115,12 @@ const PlanCard = ({ plan, isCurrentPlan }) => {
     return (
         <div className={`rounded-xl p-5 transition-all relative overflow-hidden ${
             plan.popular
-                ? 'border-2 border-violet-500 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
+                ? 'border-2 border-violet-500 bg-linear-to-br from-violet-500/10 to-fuchsia-500/10'
                 : 'border border-white/10 bg-white/5 hover:border-violet-500/30'
         }`}>
             {plan.popular && (
                 <div className="absolute top-0 right-0">
-                    <div className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
+                    <div className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
                         Most Popular
                     </div>
                 </div>
@@ -158,7 +158,7 @@ const PlanCard = ({ plan, isCurrentPlan }) => {
                 className={`w-full ${
                     isCurrentPlan
                         ? 'bg-white/10 text-white border border-white/20 cursor-default'
-                        : 'bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white hover:scale-[1.02] transition-all'
+                        : 'bg-linear-to-r from-fuchsia-500 to-violet-600 text-white hover:scale-[1.02] transition-all'
                 }`}
                 disabled={isCurrentPlan}
             >
@@ -178,7 +178,7 @@ const OutOfLimitPage = ({ currentPlan, allPlans, applications }) => {
         <div className="pt-20 pb-10">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden">
-                    <div className="p-6 border-b border-white/10 bg-gradient-to-r from-red-500/10 to-orange-500/10">
+                    <div className="p-6 border-b border-white/10 bg-linear-to-r from-red-500/10 to-orange-500/10">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
                                 <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,7 +210,7 @@ const OutOfLimitPage = ({ currentPlan, allPlans, applications }) => {
                             {maxApps !== -1 && (
                                 <>
                                     <div className="w-full bg-white/10 rounded-full h-2 mb-4">
-                                        <div className="bg-gradient-to-r from-fuchsia-500 to-violet-600 h-2 rounded-full transition-all duration-500" style={{ width: `${usagePercentage}%` }} />
+                                        <div className="bg-linear-to-r from-fuchsia-500 to-violet-600 h-2 rounded-full transition-all duration-500" style={{ width: `${usagePercentage}%` }} />
                                     </div>
                                     <p className="text-xs text-center text-gray-500">Limit resets on the 1st of each month</p>
                                 </>
@@ -225,7 +225,7 @@ const OutOfLimitPage = ({ currentPlan, allPlans, applications }) => {
                             </div>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
-                            <Button className="w-full bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20">
+                            <Button className="w-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20">
                                 <Link href="/pricing">View All Plans & Pricing</Link>
                             </Button>
                             <Button variant="bordered" className="w-full border-white/20 text-white hover:bg-white/5">
@@ -272,16 +272,26 @@ const ApplyPage = async ({ params }) => {
     const company = await getCompanyById(job.companyId);
     
     // Get user's plan from database (has maxApplicationsPerMonth)
-    const userPlan = await getSeekerPlanById(user?.plan || "free");
+    const userPlan = await getSeekerPlanById(user?.plan?.toLowerCase() || "free");
+    console.log('User Plan from DB:', userPlan);
     
     // Get all pricing plans from API (with features and limits)
     const allPlans = await getSeekerPlans();
     
-    // Find current plan from pricing data
-    const currentPlan = allPlans.find(p => p.name.toLowerCase() === userPlan?.name?.toLowerCase()) || allPlans[0];
+    // Find the matching plan from pricing data
+    const matchingPlan = allPlans.find(p => p.name.toLowerCase() === userPlan?.name?.toLowerCase());
     
-    // Get max applications from user's plan
-    const maxApps = userPlan?.maxApplicationsPerMonth || 3;
+    // Create currentPlan with the correct maxApplicationsPerMonth from userPlan
+    const currentPlan = {
+        ...matchingPlan,
+        name: userPlan?.name || "Free",
+        maxApplicationsPerMonth: userPlan?.maxApplicationsPerMonth || 3,
+        features: matchingPlan?.features || [],
+    };
+    
+    console.log('Current Plan for Form:', currentPlan);
+    
+    const maxApps = currentPlan.maxApplicationsPerMonth;
     const hasReachedLimit = maxApps !== -1 && applications.length >= maxApps;
 
     if (hasReachedLimit) {

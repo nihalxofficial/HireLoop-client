@@ -1,4 +1,3 @@
-// app/jobs/[id]/apply/JobApplyForm.jsx
 "use client";
 
 import React, { useState, useRef } from "react";
@@ -153,11 +152,14 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
         inputWrapper: "border-white/10 bg-white/5 hover:border-violet-500/50 focus-within:border-violet-500 data-[hover=true]:border-white/20 rounded-xl",
     };
 
-    // Use maxApplicationsPerMonth from currentPlan
+    // Use maxApplicationsPerMonth from currentPlan (which now has the DB value)
     const maxApps = currentPlan?.maxApplicationsPerMonth || 3;
     const usedApps = applications?.length || 0;
     const remainingApps = maxApps === -1 ? "unlimited" : maxApps - usedApps;
     const usagePercentage = maxApps === -1 ? 0 : (usedApps / maxApps) * 100;
+
+    console.log('Current Plan in Form:', currentPlan);
+    console.log('Max Apps:', maxApps);
 
     const getPlanIcon = () => {
         switch(currentPlan?.name?.toLowerCase()) {
@@ -187,7 +189,7 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                             {/* Job Info Card */}
                             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-600 flex items-center justify-center">
+                                    <div className="w-12 h-12 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 flex items-center justify-center">
                                         <BriefcaseBusiness size={20} className="text-white" />
                                     </div>
                                     <div>
@@ -218,12 +220,12 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                                 </div>
                             </div>
 
-                            {/* Plan Usage Card */}
+                            {/* Plan Usage Card - Now uses the correct maxApps from DB */}
                             <div className={`rounded-2xl border backdrop-blur-sm p-5 ${
                                 currentPlan?.name?.toLowerCase() === 'premium' 
-                                    ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10'
+                                    ? 'border-amber-500/30 bg-linear-to-br from-amber-500/10 to-orange-500/10'
                                     : currentPlan?.name?.toLowerCase() === 'pro'
-                                    ? 'border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
+                                    ? 'border-violet-500/30 bg-linear-to-br from-violet-500/10 to-fuchsia-500/10'
                                     : 'border-white/10 bg-white/5'
                             }`}>
                                 <div className="flex items-center justify-between mb-3">
@@ -232,7 +234,7 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                                         <h3 className="text-sm font-semibold text-white">Current Plan: {currentPlan?.name || "Free"}</h3>
                                     </div>
                                     {currentPlan?.popular && (
-                                        <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
+                                        <span className="text-xs px-2 py-1 rounded-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white">
                                             Most Popular
                                         </span>
                                     )}
@@ -248,7 +250,7 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                                     {maxApps !== -1 && (
                                         <div className="w-full bg-white/10 rounded-full h-2">
                                             <div 
-                                                className="bg-gradient-to-r from-fuchsia-500 to-violet-600 h-2 rounded-full transition-all duration-500"
+                                                className="bg-linear-to-r from-fuchsia-500 to-violet-600 h-2 rounded-full transition-all duration-500"
                                                 style={{ width: `${usagePercentage}%` }}
                                             />
                                         </div>
@@ -536,7 +538,7 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                                     <Button
                                         type="submit"
                                         isLoading={isSubmitting}
-                                        className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all"
+                                        className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all"
                                     >
                                         <Send size={16} />
                                         Submit Application
