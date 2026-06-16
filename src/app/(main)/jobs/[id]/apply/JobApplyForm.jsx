@@ -16,7 +16,6 @@ import {
     Send,
     Loader2,
     CheckCircle,
-    TrendingUp,
     Zap,
     Crown,
     Sparkles
@@ -154,8 +153,14 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
         inputWrapper: "border-white/10 bg-white/5 hover:border-violet-500/50 focus-within:border-violet-500 data-[hover=true]:border-white/20 rounded-xl",
     };
 
+    // Use maxApplicationsPerMonth from currentPlan
+    const maxApps = currentPlan?.maxApplicationsPerMonth || 3;
+    const usedApps = applications?.length || 0;
+    const remainingApps = maxApps === -1 ? "unlimited" : maxApps - usedApps;
+    const usagePercentage = maxApps === -1 ? 0 : (usedApps / maxApps) * 100;
+
     const getPlanIcon = () => {
-        switch(currentPlan.id) {
+        switch(currentPlan?.name?.toLowerCase()) {
             case 'pro':
                 return <Zap size={16} className="text-violet-400" />;
             case 'premium':
@@ -165,23 +170,15 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
         }
     };
 
-    const remainingApps = currentPlan.applicationsPerMonth === "unlimited" 
-        ? "unlimited" 
-        : currentPlan.applicationsPerMonth - applications.length;
-    
-    const usagePercentage = currentPlan.applicationsPerMonth === "unlimited"
-        ? 0
-        : (applications.length / currentPlan.applicationsPerMonth) * 100;
-
     return (
         <div className="pt-20 pb-10">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Back Button */}
-                <button className="mb-6 cursor-pointer flex items-center gap-2 text-gray-400 hover:text-violet-400 transition-colors">
-                    <Link href={`/jobs/${job._id}`}>
+                <Link href={`/jobs/${job._id}`}>
+                    <button className="mb-6 cursor-pointer flex items-center gap-2 text-gray-400 hover:text-violet-400 transition-colors">
                         ← Back to Job Details
-                    </Link>
-                </button>
+                    </button>
+                </Link>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Column - Job Summary & Plan Info */}
@@ -190,7 +187,7 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                             {/* Job Info Card */}
                             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-12 h-12 rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 flex items-center justify-center">
+                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-600 flex items-center justify-center">
                                         <BriefcaseBusiness size={20} className="text-white" />
                                     </div>
                                     <div>
@@ -223,20 +220,20 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
 
                             {/* Plan Usage Card */}
                             <div className={`rounded-2xl border backdrop-blur-sm p-5 ${
-                                currentPlan.id === 'premium' 
+                                currentPlan?.name?.toLowerCase() === 'premium' 
                                     ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10'
-                                    : currentPlan.id === 'pro'
+                                    : currentPlan?.name?.toLowerCase() === 'pro'
                                     ? 'border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
                                     : 'border-white/10 bg-white/5'
                             }`}>
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2">
                                         {getPlanIcon()}
-                                        <h3 className="text-sm font-semibold text-white">Current Plan: {currentPlan.name}</h3>
+                                        <h3 className="text-sm font-semibold text-white">Current Plan: {currentPlan?.name || "Free"}</h3>
                                     </div>
-                                    {currentPlan.badge && (
+                                    {currentPlan?.popular && (
                                         <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white">
-                                            {currentPlan.badge}
+                                            Most Popular
                                         </span>
                                     )}
                                 </div>
@@ -245,10 +242,10 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                                     <div className="flex justify-between text-sm mb-1">
                                         <span className="text-gray-300">Applications this month</span>
                                         <span className="text-white font-semibold">
-                                            {applications.length} / {currentPlan.applicationsPerMonth === "unlimited" ? "∞" : currentPlan.applicationsPerMonth}
+                                            {usedApps} / {maxApps === -1 ? "∞" : maxApps}
                                         </span>
                                     </div>
-                                    {currentPlan.applicationsPerMonth !== "unlimited" && (
+                                    {maxApps !== -1 && (
                                         <div className="w-full bg-white/10 rounded-full h-2">
                                             <div 
                                                 className="bg-gradient-to-r from-fuchsia-500 to-violet-600 h-2 rounded-full transition-all duration-500"
@@ -265,7 +262,7 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                                     </span>
                                 </div>
 
-                                {currentPlan.id === "free" && remainingApps <= 1 && remainingApps !== "unlimited" && (
+                                {currentPlan?.name?.toLowerCase() === "free" && remainingApps !== "unlimited" && remainingApps <= 1 && (
                                     <div className="mb-4 p-2 rounded-lg bg-orange-500/10 border border-orange-500/20">
                                         <p className="text-xs text-orange-400 text-center">
                                             ⚠️ Only {remainingApps} application{remainingApps !== 1 ? 's' : ''} left this month!
@@ -273,13 +270,13 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                                     </div>
                                 )}
 
-                                {currentPlan.id !== "premium" && (
-                                    <Link href="/pricing">
-                                        <Button size="sm" className="w-full bg-white/10 text-white hover:bg-white/20 border border-white/20">
+                                {currentPlan?.name?.toLowerCase() !== "premium" && (
+                                    <Button size="sm" className="w-full bg-white/10 text-white hover:bg-white/20 border border-white/20">
+                                        <Link href="/pricing" className="flex items-center gap-2">
                                             <Zap size={14} />
-                                            Upgrade to {currentPlan.id === "free" ? "Pro" : "Premium"}
-                                        </Button>
-                                    </Link>
+                                            Upgrade to {currentPlan?.name?.toLowerCase() === "free" ? "Pro" : "Premium"}
+                                        </Link>
+                                    </Button>
                                 )}
                             </div>
 
@@ -287,10 +284,10 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
                                 <div className="flex items-center gap-2 mb-3">
                                     <CheckCircle size={16} className="text-emerald-400" />
-                                    <h3 className="text-sm font-semibold text-white">{currentPlan.name} Plan Features</h3>
+                                    <h3 className="text-sm font-semibold text-white">{currentPlan?.name || "Free"} Plan Features</h3>
                                 </div>
                                 <ul className="space-y-2">
-                                    {currentPlan.features.map((feature, idx) => (
+                                    {currentPlan?.features?.map((feature, idx) => (
                                         <li key={idx} className="flex items-start gap-2 text-xs text-gray-400">
                                             <CheckCircle size={12} className="text-emerald-400 mt-0.5 shrink-0" />
                                             <span>{feature}</span>
@@ -539,7 +536,7 @@ const JobApplyForm = ({ job, user, company, applications, currentPlan, allPlans 
                                     <Button
                                         type="submit"
                                         isLoading={isSubmitting}
-                                        className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all"
+                                        className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all"
                                     >
                                         <Send size={16} />
                                         Submit Application

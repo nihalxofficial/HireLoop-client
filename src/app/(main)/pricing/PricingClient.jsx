@@ -255,7 +255,7 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
                     <input type="hidden" name="currency" value={plan.currency} />
                     <input type="hidden" name="interval" value={plan.interval} />
                     <input type="hidden" name="type" value={activeTab} />
-                    
+    
                     <Button
                       type="submit"
                       className={`w-full transition-all duration-300 ${

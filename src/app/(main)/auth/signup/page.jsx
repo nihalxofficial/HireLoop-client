@@ -72,8 +72,8 @@ export default function SignupPage() {
       password: userData.password,
       image: userData.image,
       role: userData.role,
+      plan: "free"
     });
-    
     if (data) {
       toast.success("SignUp Successful 🎉");
       router.push(redirectTo);
