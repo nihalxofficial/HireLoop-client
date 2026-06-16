@@ -68,7 +68,7 @@ function SectionDivider({ label }) {
   );
 }
 
-export default function DashboardSidebar({ isOpen, onClose }) {
+export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   
   const mainNavItems = [
@@ -117,9 +117,9 @@ export default function DashboardSidebar({ isOpen, onClose }) {
           <div className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-fuchsia-600/5 blur-3xl" />
         </div>
         
-        <div className="relative z-10 flex h-full flex-col">
+        <div className="relative z-10 flex h-full flex-col min-h-0">
           {/* Close button for mobile */}
-          <div className="flex h-16 items-center justify-end border-b border-white/10 px-4 lg:hidden">
+          <div className="flex h-16 items-center justify-end border-b border-white/10 px-4 lg:hidden shrink-0">
             <button 
               onClick={onClose}
               className="rounded-lg p-1 hover:bg-white/10"
@@ -128,9 +128,9 @@ export default function DashboardSidebar({ isOpen, onClose }) {
             </button>
           </div>
           
-          {/* Navigation */}
-          <div className="flex-1 overflow-y-auto px-3 py-6">
-            <nav className="space-y-1">
+          {/* Navigation - Scrollable */}
+          <div className="flex-1 overflow-y-auto px-3 py-6 min-h-0">
+            <div className="space-y-1">
               {mainNavItems.map((item) => (
                 <NavItem
                   key={item.id}
@@ -142,11 +142,11 @@ export default function DashboardSidebar({ isOpen, onClose }) {
                   onClick={onClose}
                 />
               ))}
-            </nav>
+            </div>
             
             <SectionDivider label="Your Activity" />
             
-            <nav className="space-y-1">
+            <div className="space-y-1">
               {secondNavItems.map((item) => (
                 <NavItem
                   key={item.id}
@@ -157,11 +157,11 @@ export default function DashboardSidebar({ isOpen, onClose }) {
                   onClick={onClose}
                 />
               ))}
-            </nav>
+            </div>
             
             <SectionDivider label="Account" />
             
-            <nav className="space-y-1">
+            <div className="space-y-1">
               {settingsNavItems.map((item) => (
                 <NavItem
                   key={item.id}
@@ -172,7 +172,7 @@ export default function DashboardSidebar({ isOpen, onClose }) {
                   onClick={onClose}
                 />
               ))}
-            </nav>
+            </div>
             
             {/* Upgrade Card */}
             <div className="mt-6 rounded-xl bg-linear-to-br from-fuchsia-500/10 to-violet-600/10 p-4 border border-fuchsia-500/20">
@@ -187,6 +187,9 @@ export default function DashboardSidebar({ isOpen, onClose }) {
                 Upgrade Now
               </button>
             </div>
+            
+            {/* Extra space at bottom */}
+            <div className="h-12" />
           </div>
         </div>
       </div>
