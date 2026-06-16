@@ -1,8 +1,9 @@
-export default function DashboardPage() {
+import { getUserSession } from "@/lib/core/session";
+import { redirect } from "next/navigation";
+
+export default async function DashboardPage() {
+  const user = await getUserSession();
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-white mb-2">Welcome back!</h1>
-      <p className="text-gray-400">This is your dashboard.</p>
-    </div>
+    redirect(`/dashboard/${user?.role}`)
   );
 }

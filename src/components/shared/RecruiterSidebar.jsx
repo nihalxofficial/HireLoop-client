@@ -76,20 +76,20 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
     { id: "jobs", icon: <BriefcaseBusiness size={18} />, label: "Jobs", badge: "24", href: "/dashboard/recruiter/jobs" },
     // { id: "add-job", icon: <PlusCircle size={18} />, label: "Post a Job", href: "/dashboard/recruiter/jobs/new" },
     { id: "company", icon: <Building2 size={18} />, label: "Company", href: "/dashboard/recruiter/company" },
-    { id: "candidates", icon: <Users size={18} />, label: "Candidates", badge: "12", href: "/dashboard/candidates" },
-    { id: "analytics", icon: <BarChart3 size={18} />, label: "Analytics", href: "/dashboard/analytics" },
-    { id: "messages", icon: <MessageSquare size={18} />, label: "Messages", badge: "3", href: "/dashboard/messages" },
+    { id: "candidates", icon: <Users size={18} />, label: "Candidates", badge: "12", href: "/dashboard/recruiter/candidates" },
+    { id: "analytics", icon: <BarChart3 size={18} />, label: "Analytics", href: "/dashboard/recruiter/analytics" },
+    { id: "messages", icon: <MessageSquare size={18} />, label: "Messages", badge: "3", href: "/dashboard/recruiter/messages" },
   ];
   
   const settingsNavItems = [
-    { id: "profile", icon: <User size={18} />, label: "Profile", href: "/dashboard/profile" },
-    { id: "settings", icon: <Settings size={18} />, label: "Settings", href: "/dashboard/settings" },
+    { id: "profile", icon: <User size={18} />, label: "Profile", href: "/dashboard/recruiter/profile" },
+    { id: "settings", icon: <Settings size={18} />, label: "Settings", href: "/dashboard/recruiter/settings" },
   ];
   
   const secondNavItems = [
-    { id: "documents", icon: <FileText size={18} />, label: "Documents", href: "/dashboard/documents" },
-    { id: "calendar", icon: <Calendar size={18} />, label: "Calendar", href: "/dashboard/calendar" },
-    { id: "saved", icon: <Star size={18} />, label: "Saved Jobs", href: "/dashboard/saved" },
+    { id: "documents", icon: <FileText size={18} />, label: "Documents", href: "/dashboard/recruiter/documents" },
+    { id: "calendar", icon: <Calendar size={18} />, label: "Calendar", href: "/dashboard/recruiter/calendar" },
+    { id: "saved", icon: <Star size={18} />, label: "Saved Jobs", href: "/dashboard/recruiter/saved" },
   ];
   
   const isActive = (href) => pathname === href;

@@ -5,7 +5,7 @@ export const getCompanies = async(status="approved")=>{
 } 
 
 export const getCompanyById = async(id, status="approved")=>{
-    return serverFetch(`/company/${id}?status=${status}`)
+    return serverFetch(`/company/${id}`)
 } 
 
 export const getRecruiterCompanies = async(recruiterId)=>{
