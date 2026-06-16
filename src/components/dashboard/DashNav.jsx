@@ -42,6 +42,7 @@ export default function DashNav({ onMenuClick }) {
     toast.success("Logged out successfully");
     router.push("/");
   };
+  const commonRoute = `/dashboard/${user?.role}`
 
   return (
     <nav className="fixed top-0 right-0 left-0 z-40 bg-[#050816]/90 backdrop-blur-xl border-b border-white/10">
@@ -159,7 +160,7 @@ export default function DashNav({ onMenuClick }) {
 
                   <div className="py-2">
                     <Link
-                      href="/dashboard/profile"
+                      href={commonRoute+"/profile"}
                       onClick={() => setIsDropdownOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                     >
@@ -167,7 +168,7 @@ export default function DashNav({ onMenuClick }) {
                       Profile
                     </Link>
                     <Link
-                      href="/dashboard/settings"
+                      href={`${commonRoute}/settings`}
                       onClick={() => setIsDropdownOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                     >
