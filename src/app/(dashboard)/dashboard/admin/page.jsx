@@ -286,7 +286,7 @@ const AdminPage = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-r from-violet-500/10 via-fuchsia-500/5 to-transparent backdrop-blur-sm p-6">
+      <div className="rounded-2xl border border-white/10 bg-linear-to-r from-violet-500/10 via-fuchsia-500/5 to-transparent backdrop-blur-sm p-6">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-3">
