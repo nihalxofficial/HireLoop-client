@@ -206,7 +206,7 @@ export default function Navbar() {
                     {/* Menu Items */}
                     <div className="py-2">
                       <Link
-                        href={`/dashboard/${user?.role}`}
+                        href={`/dashboard`}
                         onClick={() => setIsDropdownOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                       >
@@ -222,7 +222,7 @@ export default function Navbar() {
                         Settings
                       </Link>
                       <Link
-                        href={`/profile/${user?.id}`}
+                        href={`/profile`}
                         onClick={() => setIsDropdownOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                       >
@@ -326,7 +326,7 @@ export default function Navbar() {
                     {/* Menu Items */}
                     <div className="py-2">
                       <Link
-                        href={`/dashboard/${user?.role}`}
+                        href={`/dashboard`}
                         onClick={() => {
                           setIsDropdownOpen(false);
                           setIsOpen(false);
@@ -348,7 +348,7 @@ export default function Navbar() {
                         Settings
                       </Link>
                       <Link
-                        href={`/profile/${user?.id}`}
+                        href={`/profile`}
                         onClick={() => {
                           setIsDropdownOpen(false);
                           setIsOpen(false);

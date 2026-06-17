@@ -119,7 +119,7 @@ export default function DashNav({ onMenuClick }) {
                 <p className="text-sm font-semibold text-white">
                   {user?.name?.split(" ")[0] || "User"}
                 </p>
-                <p className="text-[10px] text-gray-400 capitalize">Recruiter</p>
+                <p className="text-[10px] text-gray-400 capitalize">{user?.role}</p>
               </div>
               <ChevronDown
                 size={14}
@@ -160,7 +160,7 @@ export default function DashNav({ onMenuClick }) {
 
                   <div className="py-2">
                     <Link
-                      href={`/profile/${user?.id}`}
+                      href={`/profile`}
                       onClick={() => setIsDropdownOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                     >

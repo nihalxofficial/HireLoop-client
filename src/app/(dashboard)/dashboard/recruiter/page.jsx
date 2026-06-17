@@ -13,8 +13,11 @@ import {
   Sparkles,
 } from "lucide-react";
 import Image from "next/image";
+import { authClient } from "@/lib/auth-client";
 
 const RecruiterPage = () => {
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
   // Get recruiter name from session or props
   // For now using sample data - replace with actual user data from your auth
   const recruiterName = "Sarah Johnson";
@@ -175,7 +178,7 @@ const RecruiterPage = () => {
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
-              {greeting}, {recruiterName}! 👋
+              {greeting}, {user?.name}! 👋
             </h1>
             <p className="text-sm text-gray-400 mt-2 max-w-2xl">
               Here&apos;s what&apos;s happening with your recruitment activities today. 

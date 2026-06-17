@@ -29,7 +29,7 @@ const UnauthorizedPage = () => {
                     {/* Icon */}
                     <div className="flex justify-center mb-6">
                         <div className="relative">
-                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-red-500/20 to-red-600/10 flex items-center justify-center border border-red-500/20">
+                            <div className="w-24 h-24 rounded-full bg-linear-to-br from-red-500/20 to-red-600/10 flex items-center justify-center border border-red-500/20">
                                 <ShieldAlert className="w-12 h-12 text-red-500" />
                             </div>
                             {/* Decorative ring */}
@@ -52,9 +52,9 @@ const UnauthorizedPage = () => {
 
                     {/* Divider */}
                     <div className="my-6 flex items-center gap-3">
-                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                        <div className="h-px flex-1 bg-linear-to-r from-transparent via-white/10 to-transparent" />
                         <AlertTriangle className="w-4 h-4 text-yellow-500/60" />
-                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                        <div className="h-px flex-1 bg-linear-to-r from-transparent via-white/10 to-transparent" />
                     </div>
 
                     {/* Info Box */}
@@ -69,7 +69,7 @@ const UnauthorizedPage = () => {
                         {/* Primary Action - Go to Dashboard */}
                         <Link
                             href={`/dashboard/${user?.role}`}
-                            className="inline-flex items-center justify-center w-full px-4 py-3 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white font-medium rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="inline-flex items-center justify-center w-full px-4 py-3 bg-linear-to-r from-fuchsia-500 to-violet-600 text-white font-medium rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98]"
                         >
                             <Home className="w-4 h-4 mr-2" />
                             Go to Dashboard

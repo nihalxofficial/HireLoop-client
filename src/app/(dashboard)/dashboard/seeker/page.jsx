@@ -15,8 +15,11 @@ import {
   Building2,
   Star,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const SeekerPage = () => {
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
   // Get seeker name from session
   const seekerName = "Michael Chen";
   const currentTime = new Date();
@@ -178,7 +181,7 @@ const SeekerPage = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-r from-violet-500/10 via-fuchsia-500/5 to-transparent backdrop-blur-sm p-6">
+      <div className="rounded-2xl border border-white/10 bg-linear-to-r from-violet-500/10 via-fuchsia-500/5 to-transparent backdrop-blur-sm p-6">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -188,7 +191,7 @@ const SeekerPage = () => {
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
-              {greeting}, {seekerName}! 🎯
+              {greeting}, {user?.name}! 🎯
             </h1>
             <p className="text-sm text-gray-400 mt-2 max-w-2xl">
               Your next career opportunity is waiting. Track your applications, 
@@ -271,7 +274,7 @@ const SeekerPage = () => {
                           </h3>
                           <p className="text-sm text-gray-400 mt-0.5">{job.company}</p>
                         </div>
-                        <div className="flex items-center gap-1 bg-gradient-to-r from-fuchsia-500/10 to-violet-600/10 px-2 py-1 rounded-full">
+                        <div className="flex items-center gap-1 bg-linear-to-r from-fuchsia-500/10 to-violet-600/10 px-2 py-1 rounded-full">
                           <Star size={10} className="text-yellow-400" />
                           <span className="text-xs font-medium text-white">{job.matchScore}% Match</span>
                         </div>

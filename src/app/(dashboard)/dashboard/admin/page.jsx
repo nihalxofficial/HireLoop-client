@@ -29,10 +29,13 @@ import {
   FileText,
 } from "lucide-react";
 import Image from "next/image";
+import { authClient } from "@/lib/auth-client";
 
 const AdminPage = () => {
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
   // Get admin name from session
-  const adminName = "Alexandra Rivera";
+  const adminName = user?.name;
   const currentTime = new Date();
   const hour = currentTime.getHours();
   let greeting = "";

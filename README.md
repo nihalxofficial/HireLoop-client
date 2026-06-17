@@ -15,6 +15,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - MongoDB Atlas
 - Canvas-confetti
 - Stripe
+- Date-fns
 
 First, run the development server:
 

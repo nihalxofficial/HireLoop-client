@@ -165,7 +165,7 @@ export default function ApplicationsClient({ initialApplications }) {
     setSelectedCV(app);
     setIsCVModalOpen(true);
     setIsCVLoading(true);
-    
+
     if (app.cv?.url) {
       try {
         const response = await fetch(app.cv.url);
@@ -199,7 +199,7 @@ export default function ApplicationsClient({ initialApplications }) {
 
     try {
       setLoading(true);
-      
+
       if (cv.url) {
         if (cv.url.startsWith('blob:')) {
           const response = await fetch(cv.url);
@@ -218,15 +218,15 @@ export default function ApplicationsClient({ initialApplications }) {
         toast.success('CV downloaded successfully');
         return;
       }
-      
+
       if (appId) {
         const response = await fetch(`/api/applications/${appId}/cv`);
-        
+
         if (!response.ok) {
           const error = await response.json();
           throw new Error(error.error || 'Failed to download CV');
         }
-        
+
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -236,7 +236,7 @@ export default function ApplicationsClient({ initialApplications }) {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        
+
         toast.success('CV downloaded successfully');
       } else {
         toast.error("CV download link not available");
@@ -276,12 +276,12 @@ export default function ApplicationsClient({ initialApplications }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/jobs">
-            <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+          <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+            <Link href="/jobs" className="flex items-center gap-2">
               <BriefcaseBusiness size={16} />
               Find More Jobs
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -452,8 +452,8 @@ export default function ApplicationsClient({ initialApplications }) {
                       <BriefcaseBusiness size={48} className="text-gray-600 mx-auto mb-4" />
                       <p className="text-gray-400 mb-2">No applications found</p>
                       <p className="text-sm text-gray-500">
-                        {searchTerm || statusFilter !== "all" 
-                          ? "Try adjusting your search or filters" 
+                        {searchTerm || statusFilter !== "all"
+                          ? "Try adjusting your search or filters"
                           : "Start applying to jobs to track your applications here"}
                       </p>
                       {!searchTerm && statusFilter === "all" && (
@@ -584,7 +584,7 @@ export default function ApplicationsClient({ initialApplications }) {
                 </button>
               </div>
             </div>
-            
+
             <div className="p-4 overflow-y-auto max-h-[calc(90vh-100px)]">
               {isCVLoading ? (
                 <div className="flex items-center justify-center h-[70vh]">
@@ -660,7 +660,7 @@ export default function ApplicationsClient({ initialApplications }) {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)] space-y-6">
               {/* Status & Date */}
               <div className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10 flex-wrap">
@@ -723,7 +723,7 @@ export default function ApplicationsClient({ initialApplications }) {
                   </h4>
                   <div className="flex flex-wrap gap-3">
                     {selectedApp.portfolio && (
-                      <a 
+                      <a
                         href={selectedApp.portfolio}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -734,7 +734,7 @@ export default function ApplicationsClient({ initialApplications }) {
                       </a>
                     )}
                     {selectedApp.linkedin && (
-                      <a 
+                      <a
                         href={selectedApp.linkedin}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -745,7 +745,7 @@ export default function ApplicationsClient({ initialApplications }) {
                       </a>
                     )}
                     {selectedApp.github && (
-                      <a 
+                      <a
                         href={selectedApp.github}
                         target="_blank"
                         rel="noopener noreferrer"

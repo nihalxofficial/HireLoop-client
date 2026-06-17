@@ -71,8 +71,6 @@ function SectionDivider({ label }) {
 
 export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
   const pathname = usePathname();
-  const { data: session, isPending } = authClient.useSession();
-  const user = session?.user;
 
   const mainNavItems = [
     { id: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard", href: "/dashboard/recruiter" },
@@ -85,7 +83,7 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
   ];
 
   const settingsNavItems = [
-    { id: "profile", icon: <User size={18} />, label: "Profile", href: `/profile/${user?.id}` },
+    { id: "profile", icon: <User size={18} />, label: "Profile", href: `/profile` },
     { id: "settings", icon: <Settings size={18} />, label: "Settings", href: "/dashboard/recruiter/settings" },
   ];
 
