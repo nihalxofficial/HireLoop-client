@@ -855,7 +855,7 @@ export default function JobsClient({ initialJobs }) {
                       setIsDetailsModalOpen(false);
                     }}
                     disabled={isUpdating(selectedJob._id)}
-                    className="flex-1 px-4 py-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl hover:bg-emerald-500/20 transition-all duration-200 border border-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 cursor-pointer px-4 py-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl hover:bg-emerald-500/20 transition-all duration-200 border border-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isUpdating(selectedJob._id) ? (
                       <>
@@ -875,7 +875,7 @@ export default function JobsClient({ initialJobs }) {
                       setIsDetailsModalOpen(false);
                     }}
                     disabled={isUpdating(selectedJob._id)}
-                    className="flex-1 px-4 py-2.5 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all duration-200 border border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 cursor-pointer px-4 py-2.5 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all duration-200 border border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isUpdating(selectedJob._id) ? (
                       <>
