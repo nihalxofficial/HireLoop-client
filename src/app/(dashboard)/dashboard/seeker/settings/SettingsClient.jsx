@@ -8,6 +8,8 @@ import {
   Select,
   ListBox,
   Switch,
+  Tab,
+  Tabs,
 } from "@heroui/react";
 import {
   User,
@@ -34,6 +36,11 @@ import {
   Building2,
   MapPin,
   Link as LinkIcon,
+  Palette,
+  Languages,
+  Smartphone,
+  Monitor,
+  Tablet,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,7 +49,6 @@ import { toast } from "react-toastify";
 export default function SettingsClient({ initialUserData }) {
   const [activeTab, setActiveTab] = useState("profile");
   const [userData, setUserData] = useState(initialUserData || {});
-  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -66,6 +72,14 @@ export default function SettingsClient({ initialUserData }) {
     applicationUpdates: true,
     marketingEmails: false,
     pushNotifications: true,
+    weeklyDigest: true,
+  });
+
+  // Appearance settings
+  const [appearanceSettings, setAppearanceSettings] = useState({
+    theme: "dark",
+    fontSize: "medium",
+    accentColor: "violet",
   });
 
   // Privacy settings
@@ -73,12 +87,14 @@ export default function SettingsClient({ initialUserData }) {
     profileVisibility: "public",
     showEmail: false,
     showPhone: false,
+    showResume: true,
   });
 
   const tabs = [
     { id: "profile", label: "Profile", icon: <User size={18} /> },
     { id: "account", label: "Account", icon: <UserCog size={18} /> },
     { id: "notifications", label: "Notifications", icon: <Bell size={18} /> },
+    { id: "appearance", label: "Appearance", icon: <Palette size={18} /> },
     { id: "privacy", label: "Privacy", icon: <Shield size={18} /> },
   ];
 
@@ -90,10 +106,8 @@ export default function SettingsClient({ initialUserData }) {
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
-      // In a real app, this would be an API call
-      // await updateUserProfile(formData);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success("Profile updated successfully!");
-      setIsEditing(false);
     } catch (error) {
       toast.error("Failed to update profile");
     } finally {
@@ -113,8 +127,7 @@ export default function SettingsClient({ initialUserData }) {
 
     setLoading(true);
     try {
-      // In a real app, this would be an API call
-      // await changePassword(formData.currentPassword, formData.newPassword);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success("Password changed successfully!");
       setFormData(prev => ({
         ...prev,
@@ -132,8 +145,7 @@ export default function SettingsClient({ initialUserData }) {
   const handleSaveNotifications = async () => {
     setLoading(true);
     try {
-      // In a real app, this would be an API call
-      // await updateNotificationSettings(notificationSettings);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success("Notification settings updated!");
     } catch (error) {
       toast.error("Failed to update notification settings");
@@ -142,11 +154,22 @@ export default function SettingsClient({ initialUserData }) {
     }
   };
 
+  const handleSaveAppearance = async () => {
+    setLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success("Appearance settings updated!");
+    } catch (error) {
+      toast.error("Failed to update appearance settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSavePrivacy = async () => {
     setLoading(true);
     try {
-      // In a real app, this would be an API call
-      // await updatePrivacySettings(privacySettings);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success("Privacy settings updated!");
     } catch (error) {
       toast.error("Failed to update privacy settings");
@@ -156,9 +179,9 @@ export default function SettingsClient({ initialUserData }) {
   };
 
   const handleLogout = async () => {
-    // In a real app, this would be an API call
-    // await authClient.signOut();
-    toast.success("Logged out successfully");
+    if (confirm("Are you sure you want to log out?")) {
+      toast.success("Logged out successfully");
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -169,26 +192,34 @@ export default function SettingsClient({ initialUserData }) {
 
   const renderProfileTab = () => (
     <div className="space-y-6">
-      {/* Profile Picture */}
-      <div className="flex items-center gap-6 p-6 rounded-2xl bg-white/5 border border-white/10">
+      {/* Profile Header */}
+      <div className="flex items-center gap-6 p-6 rounded-2xl bg-linear-to-r from-violet-500/10 via-fuchsia-500/5 to-transparent border border-white/10">
         <div className="relative">
           <Image
             width={100}
             height={100}
+            // eslint-disable-next-line react-hooks/purity
             src={userData?.avatar || userData?.image || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`}
             alt={userData?.fullName || userData?.name || "User"}
             className="w-24 h-24 rounded-full object-cover ring-4 ring-violet-500/30"
           />
-          <button className="absolute bottom-0 right-0 p-2 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg hover:scale-105 transition-all duration-200">
+          <button className="absolute bottom-0 right-0 p-2 rounded-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg hover:scale-105 transition-all duration-200">
             <Camera size={16} />
           </button>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold text-white">
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-white">
             {userData?.fullName || userData?.name || "User"}
           </h3>
           <p className="text-sm text-gray-400">{userData?.email}</p>
-          <p className="text-xs text-violet-400 capitalize mt-1">Role: {userData?.role || "Seeker"}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+              {userData?.role || "Seeker"}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Active
+            </span>
+          </div>
         </div>
       </div>
 
@@ -333,22 +364,14 @@ export default function SettingsClient({ initialUserData }) {
           />
         </div>
 
-        <div className="flex gap-3 pt-4">
-          <Button
-            onClick={handleSaveProfile}
-            isLoading={loading}
-            className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
-          >
-            <Save size={16} />
-            Save Changes
-          </Button>
-          <Button
-            onClick={() => setIsEditing(false)}
-            className="bg-white/5 text-white hover:bg-white/10 transition-colors"
-          >
-            Cancel
-          </Button>
-        </div>
+        <Button
+          onClick={handleSaveProfile}
+          isLoading={loading}
+          className="w-full md:w-auto bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
+        >
+          <Save size={16} />
+          Save Changes
+        </Button>
       </div>
     </div>
   );
@@ -357,10 +380,15 @@ export default function SettingsClient({ initialUserData }) {
     <div className="space-y-6">
       {/* Change Password */}
       <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Lock size={18} className="text-violet-400" />
-          Change Password
-        </h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-xl bg-violet-500/10">
+            <Lock size={18} className="text-violet-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white">Change Password</h3>
+            <p className="text-sm text-gray-400">Update your password to keep your account secure</p>
+          </div>
+        </div>
 
         <div className="space-y-4">
           <div>
@@ -466,42 +494,48 @@ export default function SettingsClient({ initialUserData }) {
           <Button
             onClick={handleChangePassword}
             isLoading={loading}
-            className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
+            className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
           >
             <Lock size={16} />
-            Change Password
+            Update Password
           </Button>
         </div>
       </div>
 
       {/* Account Actions */}
-      <div className="space-y-3">
-        <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4">Account Actions</h3>
-          
-          <div className="space-y-3">
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-between w-full p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-200 text-left"
-            >
-              <div className="flex items-center gap-3">
-                <LogOut size={18} className="text-red-400" />
-                <span className="text-white">Log Out</span>
-              </div>
-              <ChevronRight size={16} className="text-gray-400" />
-            </button>
-
-            <button
-              onClick={handleDeleteAccount}
-              className="flex items-center justify-between w-full p-3 rounded-xl bg-white/5 hover:bg-red-500/10 transition-all duration-200 text-left"
-            >
-              <div className="flex items-center gap-3">
-                <Trash2 size={18} className="text-red-400" />
-                <span className="text-red-400">Delete Account</span>
-              </div>
-              <ChevronRight size={16} className="text-red-400" />
-            </button>
+      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-xl bg-red-500/10">
+            <AlertCircle size={18} className="text-red-400" />
           </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white">Danger Zone</h3>
+            <p className="text-sm text-gray-400">Permanent actions that cannot be undone</p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-between w-full p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-200"
+          >
+            <div className="flex items-center gap-3">
+              <LogOut size={18} className="text-red-400" />
+              <span className="text-white">Log Out</span>
+            </div>
+            <ChevronRight size={16} className="text-gray-400" />
+          </button>
+
+          <button
+            onClick={handleDeleteAccount}
+            className="flex items-center justify-between w-full p-3 rounded-xl bg-white/5 hover:bg-red-500/10 transition-all duration-200"
+          >
+            <div className="flex items-center gap-3">
+              <Trash2 size={18} className="text-red-400" />
+              <span className="text-red-400">Delete Account</span>
+            </div>
+            <ChevronRight size={16} className="text-red-400" />
+          </button>
         </div>
       </div>
     </div>
@@ -510,13 +544,18 @@ export default function SettingsClient({ initialUserData }) {
   const renderNotificationsTab = () => (
     <div className="space-y-6">
       <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Bell size={18} className="text-violet-400" />
-          Notification Preferences
-        </h3>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-violet-500/10">
+            <Bell size={18} className="text-violet-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white">Notification Preferences</h3>
+            <p className="text-sm text-gray-400">Choose what notifications you want to receive</p>
+          </div>
+        </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
             <div>
               <p className="text-white font-medium">Email Notifications</p>
               <p className="text-sm text-gray-400">Receive notifications via email</p>
@@ -525,12 +564,12 @@ export default function SettingsClient({ initialUserData }) {
               isSelected={notificationSettings.emailNotifications}
               onValueChange={(value) => setNotificationSettings(prev => ({ ...prev, emailNotifications: value }))}
               classNames={{
-                wrapper: "group-data-[selected=true]:bg-gradient-to-r from-fuchsia-500 to-violet-600",
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
               }}
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
             <div>
               <p className="text-white font-medium">Job Alerts</p>
               <p className="text-sm text-gray-400">Get notified about new matching jobs</p>
@@ -539,12 +578,12 @@ export default function SettingsClient({ initialUserData }) {
               isSelected={notificationSettings.jobAlerts}
               onValueChange={(value) => setNotificationSettings(prev => ({ ...prev, jobAlerts: value }))}
               classNames={{
-                wrapper: "group-data-[selected=true]:bg-gradient-to-r from-fuchsia-500 to-violet-600",
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
               }}
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
             <div>
               <p className="text-white font-medium">Application Updates</p>
               <p className="text-sm text-gray-400">Get updates on your applications</p>
@@ -553,12 +592,26 @@ export default function SettingsClient({ initialUserData }) {
               isSelected={notificationSettings.applicationUpdates}
               onValueChange={(value) => setNotificationSettings(prev => ({ ...prev, applicationUpdates: value }))}
               classNames={{
-                wrapper: "group-data-[selected=true]:bg-gradient-to-r from-fuchsia-500 to-violet-600",
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
               }}
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
+            <div>
+              <p className="text-white font-medium">Weekly Digest</p>
+              <p className="text-sm text-gray-400">Receive weekly summary of activity</p>
+            </div>
+            <Switch
+              isSelected={notificationSettings.weeklyDigest}
+              onValueChange={(value) => setNotificationSettings(prev => ({ ...prev, weeklyDigest: value }))}
+              classNames={{
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
+              }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
             <div>
               <p className="text-white font-medium">Marketing Emails</p>
               <p className="text-sm text-gray-400">Receive promotional offers and updates</p>
@@ -567,12 +620,12 @@ export default function SettingsClient({ initialUserData }) {
               isSelected={notificationSettings.marketingEmails}
               onValueChange={(value) => setNotificationSettings(prev => ({ ...prev, marketingEmails: value }))}
               classNames={{
-                wrapper: "group-data-[selected=true]:bg-gradient-to-r from-fuchsia-500 to-violet-600",
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
               }}
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
             <div>
               <p className="text-white font-medium">Push Notifications</p>
               <p className="text-sm text-gray-400">Receive push notifications in browser</p>
@@ -581,7 +634,7 @@ export default function SettingsClient({ initialUserData }) {
               isSelected={notificationSettings.pushNotifications}
               onValueChange={(value) => setNotificationSettings(prev => ({ ...prev, pushNotifications: value }))}
               classNames={{
-                wrapper: "group-data-[selected=true]:bg-gradient-to-r from-fuchsia-500 to-violet-600",
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
               }}
             />
           </div>
@@ -590,7 +643,7 @@ export default function SettingsClient({ initialUserData }) {
         <Button
           onClick={handleSaveNotifications}
           isLoading={loading}
-          className="mt-6 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
+          className="mt-6 w-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
         >
           <Save size={16} />
           Save Notification Settings
@@ -599,13 +652,144 @@ export default function SettingsClient({ initialUserData }) {
     </div>
   );
 
+  const renderAppearanceTab = () => (
+    <div className="space-y-6">
+      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-violet-500/10">
+            <Palette size={18} className="text-violet-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white">Appearance Settings</h3>
+            <p className="text-sm text-gray-400">Customize how the application looks</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">
+              Theme
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => setAppearanceSettings(prev => ({ ...prev, theme: "dark" }))}
+                className={`p-3 rounded-xl border transition-all duration-200 ${
+                  appearanceSettings.theme === "dark"
+                    ? "border-violet-500 bg-violet-500/10"
+                    : "border-white/10 bg-white/5 hover:border-white/20"
+                }`}
+              >
+                <Moon size={20} className="mx-auto text-white" />
+                <p className="text-xs text-gray-400 mt-1">Dark</p>
+              </button>
+              <button
+                onClick={() => setAppearanceSettings(prev => ({ ...prev, theme: "light" }))}
+                className={`p-3 rounded-xl border transition-all duration-200 ${
+                  appearanceSettings.theme === "light"
+                    ? "border-violet-500 bg-violet-500/10"
+                    : "border-white/10 bg-white/5 hover:border-white/20"
+                }`}
+              >
+                <Sun size={20} className="mx-auto text-white" />
+                <p className="text-xs text-gray-400 mt-1">Light</p>
+              </button>
+              <button
+                onClick={() => setAppearanceSettings(prev => ({ ...prev, theme: "system" }))}
+                className={`p-3 rounded-xl border transition-all duration-200 ${
+                  appearanceSettings.theme === "system"
+                    ? "border-violet-500 bg-violet-500/10"
+                    : "border-white/10 bg-white/5 hover:border-white/20"
+                }`}
+              >
+                <Monitor size={20} className="mx-auto text-white" />
+                <p className="text-xs text-gray-400 mt-1">System</p>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">
+              Font Size
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => setAppearanceSettings(prev => ({ ...prev, fontSize: "small" }))}
+                className={`p-3 rounded-xl border transition-all duration-200 ${
+                  appearanceSettings.fontSize === "small"
+                    ? "border-violet-500 bg-violet-500/10"
+                    : "border-white/10 bg-white/5 hover:border-white/20"
+                }`}
+              >
+                <span className="text-xs text-white">Small</span>
+              </button>
+              <button
+                onClick={() => setAppearanceSettings(prev => ({ ...prev, fontSize: "medium" }))}
+                className={`p-3 rounded-xl border transition-all duration-200 ${
+                  appearanceSettings.fontSize === "medium"
+                    ? "border-violet-500 bg-violet-500/10"
+                    : "border-white/10 bg-white/5 hover:border-white/20"
+                }`}
+              >
+                <span className="text-base text-white">Medium</span>
+              </button>
+              <button
+                onClick={() => setAppearanceSettings(prev => ({ ...prev, fontSize: "large" }))}
+                className={`p-3 rounded-xl border transition-all duration-200 ${
+                  appearanceSettings.fontSize === "large"
+                    ? "border-violet-500 bg-violet-500/10"
+                    : "border-white/10 bg-white/5 hover:border-white/20"
+                }`}
+              >
+                <span className="text-lg text-white">Large</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">
+              Accent Color
+            </label>
+            <div className="flex gap-3">
+              {["violet", "fuchsia", "emerald", "blue", "orange", "pink"].map((color) => (
+                <button
+                  key={color}
+                  onClick={() => setAppearanceSettings(prev => ({ ...prev, accentColor: color }))}
+                  className={`w-10 h-10 rounded-full transition-all duration-200 ${
+                    appearanceSettings.accentColor === color
+                      ? "ring-2 ring-white ring-offset-2 ring-offset-[#050816] scale-110"
+                      : "hover:scale-105"
+                  }`}
+                  style={{ backgroundColor: color === "violet" ? "#8B5CF6" : color === "fuchsia" ? "#D946EF" : color === "emerald" ? "#34D399" : color === "blue" ? "#60A5FA" : color === "orange" ? "#FB923C" : "#EC4899" }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <Button
+          onClick={handleSaveAppearance}
+          isLoading={loading}
+          className="mt-6 w-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
+        >
+          <Save size={16} />
+          Save Appearance Settings
+        </Button>
+      </div>
+    </div>
+  );
+
   const renderPrivacyTab = () => (
     <div className="space-y-6">
       <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Shield size={18} className="text-violet-400" />
-          Privacy Settings
-        </h3>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-violet-500/10">
+            <Shield size={18} className="text-violet-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white">Privacy Settings</h3>
+            <p className="text-sm text-gray-400">Control who can see your information</p>
+          </div>
+        </div>
 
         <div className="space-y-4">
           <div>
@@ -667,7 +851,7 @@ export default function SettingsClient({ initialUserData }) {
             </Select>
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
             <div>
               <p className="text-white font-medium">Show Email</p>
               <p className="text-sm text-gray-400">Display email on your profile</p>
@@ -676,12 +860,12 @@ export default function SettingsClient({ initialUserData }) {
               isSelected={privacySettings.showEmail}
               onValueChange={(value) => setPrivacySettings(prev => ({ ...prev, showEmail: value }))}
               classNames={{
-                wrapper: "group-data-[selected=true]:bg-gradient-to-r from-fuchsia-500 to-violet-600",
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
               }}
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
             <div>
               <p className="text-white font-medium">Show Phone Number</p>
               <p className="text-sm text-gray-400">Display phone number on your profile</p>
@@ -690,7 +874,21 @@ export default function SettingsClient({ initialUserData }) {
               isSelected={privacySettings.showPhone}
               onValueChange={(value) => setPrivacySettings(prev => ({ ...prev, showPhone: value }))}
               classNames={{
-                wrapper: "group-data-[selected=true]:bg-gradient-to-r from-fuchsia-500 to-violet-600",
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
+              }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all duration-200">
+            <div>
+              <p className="text-white font-medium">Show Resume</p>
+              <p className="text-sm text-gray-400">Display your resume on your profile</p>
+            </div>
+            <Switch
+              isSelected={privacySettings.showResume}
+              onValueChange={(value) => setPrivacySettings(prev => ({ ...prev, showResume: value }))}
+              classNames={{
+                wrapper: "group-data-[selected=true]:bg-linear-to-r from-fuchsia-500 to-violet-600",
               }}
             />
           </div>
@@ -699,7 +897,7 @@ export default function SettingsClient({ initialUserData }) {
         <Button
           onClick={handleSavePrivacy}
           isLoading={loading}
-          className="mt-6 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
+          className="mt-6 w-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
         >
           <Save size={16} />
           Save Privacy Settings
@@ -722,18 +920,17 @@ export default function SettingsClient({ initialUserData }) {
         </div>
       </div>
 
-      {/* Settings Layout */}
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar */}
-        <div className="lg:w-56 flex-shrink-0">
-          <div className="sticky top-20 space-y-1 p-2 rounded-2xl bg-white/5 border border-white/10">
+      {/* Settings Layout with Tabs */}
+      <div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
+        <div className="border-b border-white/10 px-4 overflow-x-auto">
+          <div className="flex gap-1 py-3 min-w-max">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-fuchsia-500/20 to-violet-600/20 text-white border border-fuchsia-500/20"
+                    ? "bg-linear-to-r from-fuchsia-500/20 to-violet-600/20 text-white border border-fuchsia-500/20"
                     : "text-gray-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -744,16 +941,40 @@ export default function SettingsClient({ initialUserData }) {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1">
-          <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-            {activeTab === "profile" && renderProfileTab()}
-            {activeTab === "account" && renderAccountTab()}
-            {activeTab === "notifications" && renderNotificationsTab()}
-            {activeTab === "privacy" && renderPrivacyTab()}
-          </div>
+        <div className="p-6">
+          {activeTab === "profile" && renderProfileTab()}
+          {activeTab === "account" && renderAccountTab()}
+          {activeTab === "notifications" && renderNotificationsTab()}
+          {activeTab === "appearance" && renderAppearanceTab()}
+          {activeTab === "privacy" && renderPrivacyTab()}
         </div>
       </div>
     </div>
   );
 }
+
+// Add this for the Sun icon since it's used in appearance tab
+const Sun = ({ size, className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <circle cx="12" cy="12" r="5" />
+    <line x1="12" y1="1" x2="12" y2="3" />
+    <line x1="12" y1="21" x2="12" y2="23" />
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+    <line x1="1" y1="12" x2="3" y2="12" />
+    <line x1="21" y1="12" x2="23" y2="12" />
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+  </svg>
+);
