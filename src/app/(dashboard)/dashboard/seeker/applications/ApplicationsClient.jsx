@@ -801,7 +801,7 @@ export default function ApplicationsClient({ initialApplications }) {
                     <File size={16} className="text-violet-400" />
                     Cover Letter
                   </h4>
-                  <div className="p-4 rounded-xl bg-white/5 border border-white/10 max-h-[300px] overflow-y-auto">
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10 max-h-75 overflow-y-auto">
                     <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
                       {selectedApp.coverLetter}
                     </p>

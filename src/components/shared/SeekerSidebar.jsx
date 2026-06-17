@@ -76,7 +76,7 @@ export default function SeekerSidebar({ isOpen, onClose }) {
     { id: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard", href: "/dashboard/seeker" },
     { id: "jobs", icon: <BriefcaseBusiness size={18} />, label: "Browse Jobs", href: "/jobs" },
     { id: "applications", icon: <FileText size={18} />, label: "My Applications", badge: "5", href: "/dashboard/seeker/applications" },
-    { id: "saved", icon: <Bookmark size={18} />, label: "Saved Jobs", badge: "12", href: "/dashboard/seeker/saved" },
+    { id: "saved", icon: <Bookmark size={18} />, label: "Saved Jobs", badge: "12", href: "/dashboard/seeker/savedJobs" },
   ];
   
   const activityNavItems = [
