@@ -255,7 +255,7 @@ const PostJobForm = ({ companies, recruiter }) => {
             responsibilities: formData.get("responsibilities"),
             requirements:     formData.get("requirements"),
             benefits:         formData.get("benefits"),
-            status:           "active",
+            // status:           "active",
             companyId:        selectedCompanyId,
             recruiterId:      recruiter.id,
         };

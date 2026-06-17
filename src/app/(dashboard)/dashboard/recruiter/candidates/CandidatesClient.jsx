@@ -7,6 +7,7 @@ import {
   Input,
   Select,
   ListBox,
+  Pagination,
 } from "@heroui/react";
 import {
   Users,
@@ -20,7 +21,6 @@ import {
   CheckCircle,
   XCircle,
   MessageSquare,
-  MoreVertical,
   Phone,
   FileText,
   DollarSign,
@@ -30,8 +30,17 @@ import {
   Building2,
   MapPin,
   X,
+  Send,
+  UserCheck,
+  UserX,
+  Hourglass,
+  Award,
+  ChevronDown,
+  ChevronUp,
+  UserCircle,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { toast } from "react-toastify";
 
 // Helper function to get file icon
@@ -44,10 +53,58 @@ const getFileIcon = (fileName) => {
     case 'doc':
     case 'docx':
       return <FileText size={14} className="text-blue-400" />;
-    case 'txt':
-      return <FileText size={14} className="text-gray-400" />;
     default:
       return <FileText size={14} className="text-gray-400" />;
+  }
+};
+
+// Helper function to get initials from name
+const getInitials = (name) => {
+  if (!name) return "U";
+  return name
+    .split(" ")
+    .map(word => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};
+
+// Status configuration with icons and colors
+const STATUS_CONFIG = {
+  applied: {
+    color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+    icon: <Send size={14} />,
+    label: "Applied"
+  },
+  pending: {
+    color: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
+    icon: <Hourglass size={14} />,
+    label: "Pending"
+  },
+  reviewing: {
+    color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+    icon: <Eye size={14} />,
+    label: "Reviewing"
+  },
+  shortlisted: {
+    color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+    icon: <UserCheck size={14} />,
+    label: "Shortlisted"
+  },
+  interview: {
+    color: "text-violet-400 bg-violet-500/10 border-violet-500/20",
+    icon: <Calendar size={14} />,
+    label: "Interview"
+  },
+  rejected: {
+    color: "text-red-400 bg-red-500/10 border-red-500/20",
+    icon: <UserX size={14} />,
+    label: "Rejected"
+  },
+  hired: {
+    color: "text-green-400 bg-green-500/10 border-green-500/20",
+    icon: <Award size={14} />,
+    label: "Hired"
   }
 };
 
@@ -56,12 +113,16 @@ export default function CandidatesClient({ initialCandidates }) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [jobFilter, setJobFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
+  const [sortDirection, setSortDirection] = useState("desc");
   const [candidates, setCandidates] = useState(initialCandidates);
   const [savedCandidates, setSavedCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedCV, setSelectedCV] = useState(null);
   const [isCVModalOpen, setIsCVModalOpen] = useState(false);
   const [isCVLoading, setIsCVLoading] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   // Get unique job titles for filter
   const jobTitles = ["all", ...new Set(candidates.map(c => c.jobTitle).filter(Boolean))];
@@ -83,28 +144,53 @@ export default function CandidatesClient({ initialCandidates }) {
 
   // Sort candidates
   const sortedCandidates = [...filteredCandidates].sort((a, b) => {
-    if (sortBy === "recent") return new Date(b.appliedAt) - new Date(a.appliedAt);
-    if (sortBy === "name") return (a.fullName || "").localeCompare(b.fullName || "");
-    if (sortBy === "job") return (a.jobTitle || "").localeCompare(b.jobTitle || "");
-    if (sortBy === "salary") {
+    let comparison = 0;
+    if (sortBy === "recent") {
+      comparison = new Date(b.appliedAt) - new Date(a.appliedAt);
+    } else if (sortBy === "name") {
+      comparison = (a.fullName || "").localeCompare(b.fullName || "");
+    } else if (sortBy === "job") {
+      comparison = (a.jobTitle || "").localeCompare(b.jobTitle || "");
+    } else if (sortBy === "salary") {
       const aSalary = parseInt(a.expectedSalary?.replace(/[^0-9]/g, '') || '0');
       const bSalary = parseInt(b.expectedSalary?.replace(/[^0-9]/g, '') || '0');
-      return bSalary - aSalary;
+      comparison = aSalary - bSalary;
+    } else if (sortBy === "status") {
+      comparison = (a.status || "").localeCompare(b.status || "");
     }
-    return 0;
+    return sortDirection === "asc" ? comparison : -comparison;
   });
 
-  const updateCandidateStatus = async (id, newStatus) => {
+  // Pagination
+  const totalPages = Math.ceil(sortedCandidates.length / itemsPerPage);
+  const paginatedCandidates = sortedCandidates.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Handle status change - ready for API integration
+  const handleStatusChange = async (candidateId, newStatus) => {
+    setUpdatingStatus(candidateId);
+    
     try {
-      setLoading(true);
+      // Update local state immediately
       setCandidates(candidates.map(c => 
-        c._id === id ? { ...c, status: newStatus } : c
+        c._id === candidateId ? { ...c, status: newStatus } : c
       ));
-      toast.success(`Candidate status updated to ${newStatus}`);
+      
+      toast.success(`Status updated to ${STATUS_CONFIG[newStatus]?.label || newStatus}`);
+      
+      // API call here
+      // await updateCandidateStatus(candidateId, newStatus);
+      
     } catch (error) {
-      toast.error("Failed to update candidate status");
+      // Revert on error
+      setCandidates(candidates.map(c => 
+        c._id === candidateId ? { ...c, status: c.status } : c
+      ));
+      toast.error("Failed to update status");
     } finally {
-      setLoading(false);
+      setUpdatingStatus(null);
     }
   };
 
@@ -120,13 +206,11 @@ export default function CandidatesClient({ initialCandidates }) {
     setIsCVModalOpen(true);
     setIsCVLoading(true);
     
-    // If CV has a URL already, use it
     if (candidate.cv?.url) {
       setIsCVLoading(false);
       return;
     }
     
-    // Fetch CV from API
     if (candidate._id) {
       try {
         const response = await fetch(`/api/applications/${candidate._id}/cv`);
@@ -140,10 +224,6 @@ export default function CandidatesClient({ initialCandidates }) {
               url: url
             }
           }));
-        } else {
-          // If API returns error, try to show the CV name with download option
-          const error = await response.json();
-          console.error('CV fetch error:', error);
         }
       } catch (error) {
         console.error('Error loading CV:', error);
@@ -164,10 +244,8 @@ export default function CandidatesClient({ initialCandidates }) {
     try {
       setLoading(true);
       
-      // If CV has a URL (blob URL or regular URL)
       if (cv.url) {
         if (cv.url.startsWith('blob:')) {
-          // For blob URLs, fetch and download
           const response = await fetch(cv.url);
           const blob = await response.blob();
           const downloadUrl = window.URL.createObjectURL(blob);
@@ -179,21 +257,12 @@ export default function CandidatesClient({ initialCandidates }) {
           document.body.removeChild(link);
           window.URL.revokeObjectURL(downloadUrl);
         } else {
-          // For regular URLs, open in new tab
           window.open(cv.url, '_blank');
         }
         toast.success('CV downloaded successfully');
         return;
       }
       
-      // If CV has a path
-      if (cv.path) {
-        window.open(cv.path, '_blank');
-        toast.success('CV downloaded successfully');
-        return;
-      }
-      
-      // If we have an application ID, fetch from API
       if (applicationId) {
         const response = await fetch(`/api/applications/${applicationId}/cv`);
         
@@ -224,42 +293,8 @@ export default function CandidatesClient({ initialCandidates }) {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return "text-yellow-400 bg-yellow-500/10 border-yellow-500/20";
-      case "reviewing":
-        return "text-blue-400 bg-blue-500/10 border-blue-500/20";
-      case "shortlisted":
-        return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
-      case "interview":
-        return "text-violet-400 bg-violet-500/10 border-violet-500/20";
-      case "rejected":
-        return "text-red-400 bg-red-500/10 border-red-500/20";
-      case "hired":
-        return "text-green-400 bg-green-500/10 border-green-500/20";
-      default:
-        return "text-gray-400 bg-gray-500/10 border-gray-500/20";
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return <Clock size={14} />;
-      case "reviewing":
-        return <Clock size={14} />;
-      case "shortlisted":
-        return <CheckCircle size={14} />;
-      case "interview":
-        return <Calendar size={14} />;
-      case "rejected":
-        return <XCircle size={14} />;
-      case "hired":
-        return <CheckCircle size={14} />;
-      default:
-        return <Clock size={14} />;
-    }
+  const getStatusConfig = (status) => {
+    return STATUS_CONFIG[status?.toLowerCase()] || STATUS_CONFIG.applied;
   };
 
   const formatDate = (dateString) => {
@@ -279,7 +314,7 @@ export default function CandidatesClient({ initialCandidates }) {
 
   const getStatusLabel = (status) => {
     if (status === "all") return "All Statuses";
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    return getStatusConfig(status).label;
   };
 
   const getSortLabel = (sort) => {
@@ -288,7 +323,17 @@ export default function CandidatesClient({ initialCandidates }) {
       case "name": return "Name A-Z";
       case "job": return "Job Title";
       case "salary": return "Highest Salary";
+      case "status": return "Status";
       default: return "Most Recent";
+    }
+  };
+
+  const handleSort = (sortKey) => {
+    if (sortBy === sortKey) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(sortKey);
+      setSortDirection("asc");
     }
   };
 
@@ -305,7 +350,7 @@ export default function CandidatesClient({ initialCandidates }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+          <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
             <UserPlus size={16} />
             Add Candidate
           </Button>
@@ -319,36 +364,36 @@ export default function CandidatesClient({ initialCandidates }) {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
-          <p className="text-xs text-gray-400">Total Applications</p>
+          <p className="text-xs text-gray-400">Total</p>
           <p className="text-2xl font-bold text-white mt-1">{candidates.length}</p>
-          <p className="text-xs text-green-400 mt-1">All applications</p>
+          <p className="text-xs text-gray-400 mt-1">All applications</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
-          <p className="text-xs text-gray-400">Pending Review</p>
-          <p className="text-2xl font-bold text-yellow-400 mt-1">
-            {candidates.filter(c => c.status?.toLowerCase() === "pending").length}
+          <p className="text-xs text-gray-400">Applied</p>
+          <p className="text-2xl font-bold text-blue-400 mt-1">
+            {candidates.filter(c => c.status?.toLowerCase() === "applied" || c.status?.toLowerCase() === "pending").length}
           </p>
-          <p className="text-xs text-gray-400 mt-1">Awaiting action</p>
+          <p className="text-xs text-gray-400 mt-1">New</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
           <p className="text-xs text-gray-400">Shortlisted</p>
           <p className="text-2xl font-bold text-emerald-400 mt-1">
             {candidates.filter(c => c.status?.toLowerCase() === "shortlisted").length}
           </p>
-          <p className="text-xs text-gray-400 mt-1">Selected for interview</p>
+          <p className="text-xs text-gray-400 mt-1">Selected</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
-          <p className="text-xs text-gray-400">Interview Stage</p>
+          <p className="text-xs text-gray-400">Interview</p>
           <p className="text-2xl font-bold text-violet-400 mt-1">
             {candidates.filter(c => c.status?.toLowerCase() === "interview").length}
           </p>
-          <p className="text-xs text-gray-400 mt-1">Scheduled interviews</p>
+          <p className="text-xs text-gray-400 mt-1">Scheduled</p>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 transition-all duration-300 hover:border-violet-500/30">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 transition-all duration-300 hover:border-violet-500/30">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <Input
               placeholder="Search candidates by name, job title, company, or email..."
@@ -358,7 +403,7 @@ export default function CandidatesClient({ initialCandidates }) {
               variant="bordered"
               fullWidth
               classNames={{
-                input: "text-white placeholder:text-gray-500",
+                input: "text-white placeholder:text-gray-500 text-sm",
                 inputWrapper: [
                   "border-white/10",
                   "bg-white/5",
@@ -367,6 +412,7 @@ export default function CandidatesClient({ initialCandidates }) {
                   "focus-within:ring-1",
                   "focus-within:ring-violet-500/30",
                   "rounded-xl",
+                  "h-10",
                   "transition-all",
                   "duration-200",
                 ],
@@ -374,439 +420,484 @@ export default function CandidatesClient({ initialCandidates }) {
             />
           </div>
 
-          <div className="w-full sm:w-48">
-            <Select
-              className="w-full"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              variant="bordered"
-              aria-label="Filter candidates by status"
-              placeholder="Filter by status"
-              classNames={{
-                trigger: [
-                  "border-white/10",
-                  "bg-white/5",
-                  "hover:border-violet-500/50",
-                  "data-[focus=true]:border-violet-500",
-                  "data-[focus=true]:ring-1",
-                  "data-[focus=true]:ring-violet-500/30",
-                  "rounded-xl",
-                  "h-10",
-                  "transition-all",
-                  "duration-200",
-                ],
-                value: "text-white",
-                placeholder: "text-gray-500",
-              }}
-            >
-              <Select.Trigger>
-                <Select.Value>{getStatusLabel(statusFilter)}</Select.Value>
-                <Select.Indicator className="text-gray-400" />
-              </Select.Trigger>
-              <Select.Popover>
-                <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
-                  <ListBox.Item
-                    id="all"
-                    textValue="All Statuses"
-                    className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
-                  >
-                    All Statuses
-                    <ListBox.ItemIndicator className="text-violet-400" />
-                  </ListBox.Item>
-                  {statuses.filter(s => s !== "all").map(status => (
+          <div className="flex flex-wrap gap-3">
+            <div className="w-37.5">
+              <Select
+                className="w-full"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                variant="bordered"
+                aria-label="Filter by status"
+                placeholder="Status"
+                classNames={{
+                  trigger: [
+                    "border-white/10",
+                    "bg-white/5",
+                    "hover:border-violet-500/50",
+                    "data-[focus=true]:border-violet-500",
+                    "rounded-xl",
+                    "h-10",
+                    "transition-all",
+                    "duration-200",
+                  ],
+                  value: "text-white text-sm",
+                  placeholder: "text-gray-500 text-sm",
+                }}
+              >
+                <Select.Trigger>
+                  <Select.Value>{getStatusLabel(statusFilter)}</Select.Value>
+                  <Select.Indicator className="text-gray-400" />
+                </Select.Trigger>
+                <Select.Popover>
+                  <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
                     <ListBox.Item
-                      key={status}
-                      id={status}
-                      textValue={status.charAt(0).toUpperCase() + status.slice(1)}
+                      id="all"
+                      textValue="All Statuses"
                       className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
                     >
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                      All Statuses
                       <ListBox.ItemIndicator className="text-violet-400" />
                     </ListBox.Item>
-                  ))}
-                </ListBox>
-              </Select.Popover>
-            </Select>
-          </div>
+                    {statuses.filter(s => s !== "all").map(status => {
+                      const config = getStatusConfig(status);
+                      return (
+                        <ListBox.Item
+                          key={status}
+                          id={status}
+                          textValue={config.label}
+                          className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
+                        >
+                          <span className="flex items-center gap-2">
+                            {config.icon}
+                            {config.label}
+                          </span>
+                          <ListBox.ItemIndicator className="text-violet-400" />
+                        </ListBox.Item>
+                      );
+                    })}
+                  </ListBox>
+                </Select.Popover>
+              </Select>
+            </div>
 
-          <div className="w-full sm:w-48">
-            <Select
-              className="w-full"
-              value={jobFilter}
-              onChange={setJobFilter}
-              variant="bordered"
-              aria-label="Filter candidates by job"
-              placeholder="Filter by job"
-              classNames={{
-                trigger: [
-                  "border-white/10",
-                  "bg-white/5",
-                  "hover:border-violet-500/50",
-                  "data-[focus=true]:border-violet-500",
-                  "data-[focus=true]:ring-1",
-                  "data-[focus=true]:ring-violet-500/30",
-                  "rounded-xl",
-                  "h-10",
-                  "transition-all",
-                  "duration-200",
-                ],
-                value: "text-white",
-                placeholder: "text-gray-500",
-              }}
-            >
-              <Select.Trigger>
-                <Select.Value>{jobFilter === "all" ? "All Jobs" : jobFilter}</Select.Value>
-                <Select.Indicator className="text-gray-400" />
-              </Select.Trigger>
-              <Select.Popover>
-                <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
-                  <ListBox.Item
-                    id="all"
-                    textValue="All Jobs"
-                    className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
-                  >
-                    All Jobs
-                    <ListBox.ItemIndicator className="text-violet-400" />
-                  </ListBox.Item>
-                  {jobTitles.filter(j => j !== "all").map(job => (
+            <div className="w-37.5">
+              <Select
+                className="w-full"
+                value={jobFilter}
+                onChange={setJobFilter}
+                variant="bordered"
+                aria-label="Filter by job"
+                placeholder="Job"
+                classNames={{
+                  trigger: [
+                    "border-white/10",
+                    "bg-white/5",
+                    "hover:border-violet-500/50",
+                    "data-[focus=true]:border-violet-500",
+                    "rounded-xl",
+                    "h-10",
+                    "transition-all",
+                    "duration-200",
+                  ],
+                  value: "text-white text-sm",
+                  placeholder: "text-gray-500 text-sm",
+                }}
+              >
+                <Select.Trigger>
+                  <Select.Value>{jobFilter === "all" ? "All Jobs" : jobFilter}</Select.Value>
+                  <Select.Indicator className="text-gray-400" />
+                </Select.Trigger>
+                <Select.Popover>
+                  <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
                     <ListBox.Item
-                      key={job}
-                      id={job}
-                      textValue={job}
+                      id="all"
+                      textValue="All Jobs"
                       className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
                     >
-                      {job}
+                      All Jobs
                       <ListBox.ItemIndicator className="text-violet-400" />
                     </ListBox.Item>
-                  ))}
-                </ListBox>
-              </Select.Popover>
-            </Select>
-          </div>
+                    {jobTitles.filter(j => j !== "all").map(job => (
+                      <ListBox.Item
+                        key={job}
+                        id={job}
+                        textValue={job}
+                        className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
+                      >
+                        {job}
+                        <ListBox.ItemIndicator className="text-violet-400" />
+                      </ListBox.Item>
+                    ))}
+                  </ListBox>
+                </Select.Popover>
+              </Select>
+            </div>
 
-          <div className="w-full sm:w-48">
-            <Select
-              className="w-full"
-              value={sortBy}
-              onChange={setSortBy}
-              variant="bordered"
-              aria-label="Sort candidates"
-              placeholder="Sort by"
-              classNames={{
-                trigger: [
-                  "border-white/10",
-                  "bg-white/5",
-                  "hover:border-violet-500/50",
-                  "data-[focus=true]:border-violet-500",
-                  "data-[focus=true]:ring-1",
-                  "data-[focus=true]:ring-violet-500/30",
-                  "rounded-xl",
-                  "h-10",
-                  "transition-all",
-                  "duration-200",
-                ],
-                value: "text-white",
-                placeholder: "text-gray-500",
-              }}
-            >
-              <Select.Trigger>
-                <Select.Value>{getSortLabel(sortBy)}</Select.Value>
-                <Select.Indicator className="text-gray-400" />
-              </Select.Trigger>
-              <Select.Popover>
-                <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
-                  <ListBox.Item
-                    id="recent"
-                    textValue="Most Recent"
-                    className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
-                  >
-                    Most Recent
-                    <ListBox.ItemIndicator className="text-violet-400" />
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id="name"
-                    textValue="Name A-Z"
-                    className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
-                  >
-                    Name A-Z
-                    <ListBox.ItemIndicator className="text-violet-400" />
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id="job"
-                    textValue="Job Title"
-                    className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
-                  >
-                    Job Title
-                    <ListBox.ItemIndicator className="text-violet-400" />
-                  </ListBox.Item>
-                  <ListBox.Item
-                    id="salary"
-                    textValue="Highest Salary"
-                    className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
-                  >
-                    Highest Salary
-                    <ListBox.ItemIndicator className="text-violet-400" />
-                  </ListBox.Item>
-                </ListBox>
-              </Select.Popover>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      {/* Candidates Grid */}
-      <div className="space-y-4">
-        {sortedCandidates.map((candidate) => (
-          <div
-            key={candidate._id}
-            className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 transition-all duration-300 hover:border-violet-500/30 hover:bg-white/10"
-          >
-            <div className="flex flex-col gap-4">
-              {/* Top Row: Status Badge and Save Button */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2.5 py-1 rounded-full border flex items-center gap-1 ${getStatusColor(candidate.status)}`}>
-                    {getStatusIcon(candidate.status)}
-                    {candidate.status?.charAt(0).toUpperCase() + candidate.status?.slice(1) || "Pending"}
-                  </span>
-                </div>
-                <button
-                  onClick={() => toggleSaved(candidate._id)}
-                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  {savedCandidates.includes(candidate._id) ? (
-                    <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                  ) : (
-                    <StarOff size={16} className="text-gray-400" />
-                  )}
-                </button>
-              </div>
-
-              {/* Main Content */}
-              <div className="flex flex-col md:flex-row gap-4">
-                {/* Avatar & Basic Info */}
-                <div className="flex items-start gap-4 flex-1">
-                  <Image
-                    width={64}
-                    height={64}
-                    src={candidate.avatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`}
-                    alt={candidate.fullName || "Candidate"}
-                    className="w-16 h-16 rounded-full ring-2 ring-violet-500/30 object-cover"
-                  />
-                  
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white hover:text-violet-400 transition-colors cursor-pointer">
-                      {candidate.fullName || "Unknown Candidate"}
-                    </h3>
-                    <p className="text-sm text-gray-400 mt-0.5">{candidate.jobTitle || "No position"}</p>
-                    
-                    {/* Company Info */}
-                    {candidate.companyName && (
-                      <div className="flex items-center gap-2 mt-1">
-                        <Building2 size={14} className="text-violet-400" />
-                        <span className="text-sm text-gray-300">{candidate.companyName}</span>
-                        {candidate.companyLocation && (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-gray-500" />
-                            <MapPin size={12} className="text-gray-400" />
-                            <span className="text-xs text-gray-400">{candidate.companyLocation}</span>
-                          </>
-                        )}
-                      </div>
-                    )}
-                    
-                    <div className="flex flex-wrap items-center gap-3 mt-2">
-                      <span className="flex items-center gap-1 text-xs text-gray-400">
-                        <Calendar size={12} />
-                        Applied {formatDate(candidate.appliedAt)}
-                      </span>
-                      {candidate.phone && (
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                          <Phone size={12} className="text-emerald-400" />
-                          {candidate.phone}
-                        </span>
-                      )}
-                      {candidate.expectedSalary && (
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                          <DollarSign size={12} className="text-green-400" />
-                          {formatSalary(candidate.expectedSalary)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-wrap items-center gap-2 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-4">
-                  <button className="p-2 rounded-lg text-gray-400 hover:text-violet-400 hover:bg-white/10 transition-all duration-200" title="View Profile">
-                    <Eye size={18} />
-                  </button>
-                  <button className="p-2 rounded-lg text-gray-400 hover:text-emerald-400 hover:bg-white/10 transition-all duration-200" title="Send Message">
-                    <MessageSquare size={18} />
-                  </button>
-                  <button className="p-2 rounded-lg text-gray-400 hover:text-fuchsia-400 hover:bg-white/10 transition-all duration-200" title="Send Email">
-                    <Mail size={18} />
-                  </button>
-                  
-                  {/* Status Update Select */}
-                  <Select
-                    className="w-32"
-                    value={candidate.status || "pending"}
-                    onChange={(value) => updateCandidateStatus(candidate._id, value)}
-                    variant="bordered"
-                    aria-label="Change candidate status"
-                    size="sm"
-                    placeholder="Set status"
-                    classNames={{
-                      trigger: [
-                        "border-white/10",
-                        "bg-white/5",
-                        "hover:border-violet-500/50",
-                        "data-[focus=true]:border-violet-500",
-                        "rounded-lg",
-                        "h-8",
-                        "min-h-8",
-                        "px-2",
-                        "transition-all",
-                        "duration-200",
-                      ],
-                      value: "text-white text-xs",
-                      placeholder: "text-gray-500 text-xs",
-                    }}
-                  >
-                    <Select.Trigger>
-                      <Select.Value>
-                        {candidate.status?.charAt(0).toUpperCase() + candidate.status?.slice(1) || "Pending"}
-                      </Select.Value>
-                      <Select.Indicator className="text-gray-400 w-3 h-3" />
-                    </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
-                        <ListBox.Item id="pending" textValue="Pending" className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200">
-                          Pending
-                          <ListBox.ItemIndicator className="text-violet-400" />
-                        </ListBox.Item>
-                        <ListBox.Item id="reviewing" textValue="Reviewing" className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200">
-                          Reviewing
-                          <ListBox.ItemIndicator className="text-violet-400" />
-                        </ListBox.Item>
-                        <ListBox.Item id="shortlisted" textValue="Shortlisted" className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200">
-                          Shortlisted
-                          <ListBox.ItemIndicator className="text-violet-400" />
-                        </ListBox.Item>
-                        <ListBox.Item id="interview" textValue="Interview" className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200">
-                          Interview
-                          <ListBox.ItemIndicator className="text-violet-400" />
-                        </ListBox.Item>
-                        <ListBox.Item id="rejected" textValue="Rejected" className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200">
-                          Rejected
-                          <ListBox.ItemIndicator className="text-violet-400" />
-                        </ListBox.Item>
-                        <ListBox.Item id="hired" textValue="Hired" className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200">
-                          Hired
-                          <ListBox.ItemIndicator className="text-violet-400" />
-                        </ListBox.Item>
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
-                </div>
-              </div>
-
-              {/* CV Section - Moved to bottom */}
-              <div className="flex items-center gap-2 flex-wrap pt-3 border-t border-white/10">
-                {/* Social Links */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  {candidate.portfolio && (
-                    <a 
-                      href={candidate.portfolio}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 transition-colors"
+            <div className="w-37.5">
+              <Select
+                className="w-full"
+                value={sortBy}
+                onChange={setSortBy}
+                variant="bordered"
+                aria-label="Sort candidates"
+                placeholder="Sort"
+                classNames={{
+                  trigger: [
+                    "border-white/10",
+                    "bg-white/5",
+                    "hover:border-violet-500/50",
+                    "data-[focus=true]:border-violet-500",
+                    "rounded-xl",
+                    "h-10",
+                    "transition-all",
+                    "duration-200",
+                  ],
+                  value: "text-white text-sm",
+                  placeholder: "text-gray-500 text-sm",
+                }}
+              >
+                <Select.Trigger>
+                  <Select.Value>{getSortLabel(sortBy)}</Select.Value>
+                  <Select.Indicator className="text-gray-400" />
+                </Select.Trigger>
+                <Select.Popover>
+                  <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
+                    <ListBox.Item
+                      id="recent"
+                      textValue="Most Recent"
+                      className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
                     >
-                      <ExternalLink size={12} />
-                      Portfolio
-                    </a>
-                  )}
-                  {candidate.linkedin && (
-                    <a 
-                      href={candidate.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                      Most Recent
+                      <ListBox.ItemIndicator className="text-violet-400" />
+                    </ListBox.Item>
+                    <ListBox.Item
+                      id="name"
+                      textValue="Name A-Z"
+                      className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
                     >
-                      <ExternalLink size={12} />
-                      LinkedIn
-                    </a>
-                  )}
-                  {candidate.github && (
-                    <a 
-                      href={candidate.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-300 transition-colors"
+                      Name A-Z
+                      <ListBox.ItemIndicator className="text-violet-400" />
+                    </ListBox.Item>
+                    <ListBox.Item
+                      id="job"
+                      textValue="Job Title"
+                      className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
                     >
-                      <ExternalLink size={12} />
-                      GitHub
-                    </a>
-                  )}
-                </div>
-                
-                {/* CV with View/Download buttons */}
-                {candidate.cv && candidate.cv.name ? (
-                  <div className="flex items-center gap-2 ml-auto">
-                    <div className="flex items-center gap-1 text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-lg border border-white/10">
-                      {getFileIcon(candidate.cv.name)}
-                      <span className="truncate max-w-[120px]">{candidate.cv.name}</span>
-                      {candidate.cv.size && (
-                        <span className="text-[10px] text-gray-500">
-                          ({(candidate.cv.size / 1024).toFixed(0)} KB)
-                        </span>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => handleViewCV(candidate)}
-                      className="p-1.5 rounded-lg text-violet-400 hover:text-violet-300 hover:bg-white/10 transition-all duration-200"
-                      title="View CV"
+                      Job Title
+                      <ListBox.ItemIndicator className="text-violet-400" />
+                    </ListBox.Item>
+                    <ListBox.Item
+                      id="salary"
+                      textValue="Highest Salary"
+                      className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
                     >
-                      <Eye size={14} />
-                    </button>
-                    <button
-                      onClick={() => handleDownloadCV(candidate.cv, candidate._id)}
-                      className="p-1.5 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-white/10 transition-all duration-200"
-                      title="Download CV"
+                      Highest Salary
+                      <ListBox.ItemIndicator className="text-violet-400" />
+                    </ListBox.Item>
+                    <ListBox.Item
+                      id="status"
+                      textValue="Status"
+                      className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
                     >
-                      <Download size={14} />
-                    </button>
-                  </div>
-                ) : (
-                  <span className="text-xs text-gray-500 ml-auto">No CV uploaded</span>
-                )}
-              </div>
+                      Status
+                      <ListBox.ItemIndicator className="text-violet-400" />
+                    </ListBox.Item>
+                  </ListBox>
+                </Select.Popover>
+              </Select>
             </div>
           </div>
-        ))}
+        </div>
       </div>
 
-      {/* Empty State */}
-      {sortedCandidates.length === 0 && (
-        <div className="text-center py-12">
-          <Users size={48} className="text-gray-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white">No candidates found</h3>
-          <p className="text-sm text-gray-400 mt-1">
-            Try adjusting your search or filters to find candidates
-          </p>
+      {/* Candidates Table */}
+      <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-violet-500/30">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/10 bg-white/5">
+                <th className="text-left px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-400 cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort("name")}>
+                  <div className="flex items-center gap-1">
+                    Candidate
+                    {sortBy === "name" && (sortDirection === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                  </div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-400 cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort("job")}>
+                  <div className="flex items-center gap-1">
+                    Job / Company
+                    {sortBy === "job" && (sortDirection === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                  </div>
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-400 cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort("status")}>
+                  <div className="flex items-center gap-1">
+                    Status
+                    {sortBy === "status" && (sortDirection === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                  </div>
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-400 whitespace-nowrap">
+                  Contact
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-400 cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort("recent")}>
+                  <div className="flex items-center gap-1">
+                    Applied
+                    {sortBy === "recent" && (sortDirection === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                  </div>
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-400 whitespace-nowrap">
+                  CV
+                </th>
+                <th className="text-center px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-400 whitespace-nowrap">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedCandidates.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-16">
+                    <Users size={48} className="text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-400 mb-2">No candidates found</p>
+                    <p className="text-sm text-gray-500">Try adjusting your search or filters</p>
+                  </td>
+                </tr>
+              ) : (
+                paginatedCandidates.map((candidate) => {
+                  const statusConfig = getStatusConfig(candidate.status);
+                  const avatarUrl = candidate.avatar || 
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.fullName || 'User')}&background=8B5CF6&color=fff&size=64&bold=true`;
+                  
+                  return (
+                    <tr key={candidate._id} className="border-b border-white/5 hover:bg-white/5 transition-all duration-200 group">
+                      {/* Candidate - Name, Email, Salary */}
+                      <td className="px-6 py-3 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <div className="relative shrink-0">
+                            <Image
+                              width={40}
+                              height={40}
+                              src={avatarUrl}
+                              alt={candidate.fullName || "Candidate"}
+                              className="w-10 h-10 rounded-full ring-2 ring-violet-500/30 object-cover"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                const parent = e.target.parentElement;
+                                const div = document.createElement('div');
+                                div.className = 'w-10 h-10 rounded-full ring-2 ring-violet-500/30 flex items-center justify-center bg-linear-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-xs font-semibold';
+                                div.textContent = getInitials(candidate.fullName);
+                                parent.appendChild(div);
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-white group-hover:text-violet-400 transition-colors">
+                              {candidate.fullName || "Unknown"}
+                            </p>
+                            <p className="text-xs text-gray-400">{candidate.email || "No email"}</p>
+                            {candidate.expectedSalary && (
+                              <p className="text-xs text-green-400 flex items-center gap-1 mt-0.5">
+                                <DollarSign size={12} />
+                                {formatSalary(candidate.expectedSalary)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Job / Company - with more padding on left */}
+                      <td className="px-6 py-3 whitespace-nowrap">
+                        <p className="text-sm text-white">{candidate.jobTitle || "No position"}</p>
+                        {candidate.companyName && (
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <Building2 size={12} className="text-violet-400" />
+                            <span className="text-xs text-gray-400">{candidate.companyName}</span>
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className={`text-xs px-2.5 py-1 rounded-full border inline-flex items-center gap-1.5 ${statusConfig.color}`}>
+                          {statusConfig.icon}
+                          {statusConfig.label}
+                        </span>
+                      </td>
+
+                      {/* Contact - Phone only */}
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {candidate.phone ? (
+                          <p className="text-xs text-gray-400 flex items-center gap-1">
+                            <Phone size={12} className="text-emerald-400" />
+                            {candidate.phone}
+                          </p>
+                        ) : (
+                          <span className="text-xs text-gray-500">No phone</span>
+                        )}
+                        {candidate.noticePeriod && (
+                          <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                            <Clock size={12} className="text-blue-400" />
+                            {candidate.noticePeriod}
+                          </p>
+                        )}
+                      </td>
+
+                      {/* Applied Date */}
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-sm text-gray-400">{formatDate(candidate.appliedAt)}</span>
+                      </td>
+
+                      {/* CV */}
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {candidate.cv && candidate.cv.name ? (
+                          <div className="flex items-center gap-1.5">
+                            {getFileIcon(candidate.cv.name)}
+                            <span className="text-xs text-gray-400 truncate max-w-25">
+                              {candidate.cv.name}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-500">No CV</span>
+                        )}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-1">
+                          {/* View Profile */}
+                          <Link href={`/profile/${candidate.applicantId || candidate._id}`}>
+                            <button
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-white/10 transition-all duration-200 cursor-pointer"
+                              title="View Profile"
+                            >
+                              <UserCircle size={16} />
+                            </button>
+                          </Link>
+
+                          <button
+                            onClick={() => toggleSaved(candidate._id)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-yellow-400 hover:bg-white/10 transition-all duration-200 cursor-pointer"
+                            title="Save"
+                          >
+                            {savedCandidates.includes(candidate._id) ? (
+                              <Star size={16} className="fill-yellow-400 text-yellow-400" />
+                            ) : (
+                              <StarOff size={16} />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleViewCV(candidate)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-violet-400 hover:bg-white/10 transition-all duration-200 cursor-pointer"
+                            title="View CV"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDownloadCV(candidate.cv, candidate._id)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-400 hover:bg-white/10 transition-all duration-200 cursor-pointer"
+                            title="Download CV"
+                          >
+                            <Download size={16} />
+                          </button>
+                          <button
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-400 hover:bg-white/10 transition-all duration-200 cursor-pointer"
+                            title="Message"
+                          >
+                            <MessageSquare size={16} />
+                          </button>
+                          
+                          {/* Status Update Select - HeroUI */}
+                          <Select
+                            className="w-27.5"
+                            value={candidate.status || "applied"}
+                            onChange={(value) => handleStatusChange(candidate._id, value)}
+                            variant="bordered"
+                            aria-label="Change status"
+                            size="sm"
+                            placeholder="Status"
+                            isDisabled={updatingStatus === candidate._id}
+                            classNames={{
+                              trigger: [
+                                "border-white/10",
+                                "bg-white/5",
+                                "hover:border-violet-500/50",
+                                "data-[focus=true]:border-violet-500",
+                                "rounded-lg",
+                                "h-8",
+                                "min-h-8",
+                                "px-2",
+                                "transition-all",
+                                "duration-200",
+                              ],
+                              value: "text-white text-xs",
+                              placeholder: "text-gray-500 text-xs",
+                            }}
+                          >
+                            <Select.Trigger>
+                              <Select.Value />
+                              <Select.Indicator className="text-gray-400 w-3 h-3" />
+                            </Select.Trigger>
+                            <Select.Popover>
+                              <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
+                                {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                                  <ListBox.Item 
+                                    key={key}
+                                    id={key}
+                                    textValue={config.label}
+                                    className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
+                                  >
+                                    <span className="flex items-center gap-2 text-sm">
+                                      {config.icon}
+                                      {config.label}
+                                    </span>
+                                    <ListBox.ItemIndicator className="text-violet-400" />
+                                  </ListBox.Item>
+                                ))}
+                              </ListBox>
+                            </Select.Popover>
+                          </Select>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center p-4 border-t border-white/10">
+            <Pagination
+              total={totalPages}
+              page={currentPage}
+              onChange={setCurrentPage}
+              classNames={{
+                wrapper: "gap-2",
+                item: "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white rounded-lg transition-all duration-200",
+                cursor: "bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg",
+              }}
+            />
+          </div>
+        )}
+
+        {/* Footer */}
+        {sortedCandidates.length > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
+            <span className="text-xs text-gray-400">
+              Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, sortedCandidates.length)} of {sortedCandidates.length} candidates
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* CV Viewer Modal */}
       {isCVModalOpen && selectedCV && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#0a0f1a] rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">
               <div>
                 <h3 className="text-lg font-semibold text-white">
-                  {selectedCV.fullName || "Candidate"}'s CV
+                  {selectedCV.fullName || "Candidate"}&apos;s CV
                 </h3>
                 <p className="text-sm text-gray-400">
                   {selectedCV.cv?.name || "Resume"}
@@ -816,7 +907,7 @@ export default function CandidatesClient({ initialCandidates }) {
                 {selectedCV.cv && (
                   <button
                     onClick={() => handleDownloadCV(selectedCV.cv, selectedCV._id)}
-                    className="p-2 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-white/10 transition-all duration-200"
+                    className="p-2 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-white/10 transition-all duration-200 cursor-pointer"
                     title="Download CV"
                   >
                     <Download size={18} />
@@ -827,14 +918,13 @@ export default function CandidatesClient({ initialCandidates }) {
                     setIsCVModalOpen(false);
                     setSelectedCV(null);
                   }}
-                  className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+                  className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200 cursor-pointer"
                 >
                   <X size={20} />
                 </button>
               </div>
             </div>
             
-            {/* CV Content */}
             <div className="p-4 overflow-y-auto max-h-[calc(90vh-100px)]">
               {isCVLoading ? (
                 <div className="flex items-center justify-center h-[70vh]">
@@ -858,12 +948,9 @@ export default function CandidatesClient({ initialCandidates }) {
                   <p className="text-sm text-gray-400 mt-1">
                     {selectedCV.cv.size ? `${(selectedCV.cv.size / 1024).toFixed(0)} KB` : 'File'}
                   </p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Click download to view the full CV
-                  </p>
                   <button
                     onClick={() => handleDownloadCV(selectedCV.cv, selectedCV._id)}
-                    className="mt-6 px-6 py-2.5 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="mt-6 px-6 py-2.5 bg-linear-to-r from-fuchsia-500 to-violet-600 text-white rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                   >
                     Download CV
                   </button>
@@ -871,7 +958,7 @@ export default function CandidatesClient({ initialCandidates }) {
               ) : (
                 <div className="flex flex-col items-center justify-center py-12">
                   <FileText size={48} className="text-gray-600 mb-4" />
-                  <p className="text-gray-400">No CV available for this candidate</p>
+                  <p className="text-gray-400">No CV available</p>
                 </div>
               )}
             </div>

@@ -25,7 +25,7 @@ async function getCandidates() {
     // Fetch additional details for each application
     const enrichedCandidates = await Promise.all(
       applications.map(async (application) => {
-        // Get applicant details
+        // Get applicant details using the applicantId from the application
         let applicantDetails = null;
         if (application.applicantId) {
           try {
@@ -45,17 +45,10 @@ async function getCandidates() {
           }
         }
 
-        // Generate CV URL - adjust based on your API endpoint
+        // Generate CV URL
         let cvUrl = null;
         if (application.cv?.name) {
-          // Option 1: If you have a direct download endpoint
           cvUrl = `/api/applications/${application._id}/cv`;
-          
-          // Option 2: If you store CVs in a cloud storage like S3
-          // cvUrl = `https://your-storage-bucket.com/cvs/${application.cv.name}`;
-          
-          // Option 3: If you have a public URL
-          // cvUrl = `/uploads/cvs/${application.cv.name}`;
         }
 
         // Combine all data into a single candidate object
@@ -67,11 +60,11 @@ async function getCandidates() {
           recruiterId: application.recruiterId,
           applicantId: application.applicantId,
           
-          // Applicant details
-          fullName: applicantDetails?.fullName || application.fullName || "Unknown Applicant",
+          // Applicant details - prefer applicantDetails from getUserByUserId
+          fullName: applicantDetails?.name || applicantDetails?.fullName || application.fullName || "Unknown Applicant",
           email: applicantDetails?.email || application.email || "",
           phone: applicantDetails?.phone || application.phone || "",
-          avatar: applicantDetails?.avatar || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
+          avatar: applicantDetails?.image || applicantDetails?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(applicantDetails?.name || application.fullName || 'User')}&background=8B5CF6&color=fff&size=64&bold=true`,
           
           // Application details
           coverLetter: application.coverLetter || "",
@@ -82,9 +75,9 @@ async function getCandidates() {
           noticePeriod: application.noticePeriod || "",
           cv: {
             ...application.cv,
-            url: cvUrl // Add the URL to the CV object
+            url: cvUrl
           },
-          status: application.status || "pending",
+          status: application.status || "applied",
           appliedAt: application.appliedAt || new Date().toISOString(),
           updatedAt: application.updatedAt || new Date().toISOString(),
           
@@ -98,6 +91,7 @@ async function getCandidates() {
           skills: applicantDetails?.skills || [],
           experience: applicantDetails?.experience || "",
           education: applicantDetails?.education || "",
+          plan: applicantDetails?.plan || "free",
         };
       })
     );
