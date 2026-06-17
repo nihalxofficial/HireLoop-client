@@ -19,6 +19,7 @@ import {
   MessageSquare,
   History,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 // Navigation Item Component
 function NavItem({ icon, label, active, badge, onClick, href }) {
@@ -71,6 +72,8 @@ function SectionDivider({ label }) {
 
 export default function SeekerSidebar({ isOpen, onClose }) {
   const pathname = usePathname();
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
   
   const mainNavItems = [
     { id: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard", href: "/dashboard/seeker" },
@@ -87,7 +90,7 @@ export default function SeekerSidebar({ isOpen, onClose }) {
   ];
   
   const settingsNavItems = [
-    { id: "profile", icon: <User size={18} />, label: "Profile", href: "/dashboard/seeker/profile" },
+    { id: "profile", icon: <User size={18} />, label: "Profile", href: `/profile/${user?.id}` },
     { id: "settings", icon: <Settings size={18} />, label: "Settings", href: "/dashboard/seeker/settings" },
   ];
   

@@ -160,7 +160,7 @@ export default function DashNav({ onMenuClick }) {
 
                   <div className="py-2">
                     <Link
-                      href={commonRoute+"/profile"}
+                      href={`/profile/${user?.id}`}
                       onClick={() => setIsDropdownOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                     >
@@ -176,7 +176,7 @@ export default function DashNav({ onMenuClick }) {
                       Settings
                     </Link>
                     <Link
-                      href="/dashboard/help"
+                      href="/help"
                       onClick={() => setIsDropdownOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                     >

@@ -585,7 +585,7 @@ export default function SavedJobsClient({ initialSavedJobs }) {
                 <div className="flex items-center gap-1">
                   <Link href={`/jobs/${job._id}`}>
                     <button
-                      className="p-1.5 rounded-lg text-gray-400 hover:text-violet-400 hover:bg-white/10 transition-all duration-200"
+                      className="p-1.5 cursor-pointer rounded-lg text-gray-400 hover:text-violet-400 hover:bg-white/10 transition-all duration-200"
                       title="View Job"
                     >
                       <Eye size={14} />
@@ -593,7 +593,7 @@ export default function SavedJobsClient({ initialSavedJobs }) {
                   </Link>
                   <Link href={`/jobs/${job._id}/apply`}>
                     <button
-                      className="px-3 py-1 text-xs font-medium rounded-lg bg-linear-to-r from-fuchsia-500 to-violet-600 text-white hover:opacity-90 transition-all"
+                      className="px-3 cursor-pointer py-1 text-xs font-medium rounded-lg bg-linear-to-r from-fuchsia-500 to-violet-600 text-white hover:opacity-90 transition-all"
                     >
                       Apply
                     </button>

@@ -18,6 +18,7 @@ import {
   User,
   Settings,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 // Navigation Item Component
 function NavItem({ icon, label, active, badge, onClick, href }) {
@@ -39,7 +40,7 @@ function NavItem({ icon, label, active, badge, onClick, href }) {
       `}>
         {icon}
       </div>
-      
+
       <span className="flex-1 text-left">{label}</span>
       {badge && (
         <span className="rounded-full bg-linear-to-r from-fuchsia-500 to-violet-600 px-1.5 py-0.5 text-[10px] font-medium text-white">
@@ -70,7 +71,9 @@ function SectionDivider({ label }) {
 
 export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
   const pathname = usePathname();
-  
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+
   const mainNavItems = [
     { id: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard", href: "/dashboard/recruiter" },
     { id: "jobs", icon: <BriefcaseBusiness size={18} />, label: "Jobs", badge: "24", href: "/dashboard/recruiter/jobs" },
@@ -80,30 +83,30 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
     { id: "analytics", icon: <BarChart3 size={18} />, label: "Analytics", href: "/dashboard/recruiter/analytics" },
     { id: "messages", icon: <MessageSquare size={18} />, label: "Messages", badge: "3", href: "/dashboard/recruiter/messages" },
   ];
-  
+
   const settingsNavItems = [
-    { id: "profile", icon: <User size={18} />, label: "Profile", href: "/dashboard/recruiter/profile" },
+    { id: "profile", icon: <User size={18} />, label: "Profile", href: `/profile/${user?.id}` },
     { id: "settings", icon: <Settings size={18} />, label: "Settings", href: "/dashboard/recruiter/settings" },
   ];
-  
+
   const secondNavItems = [
     { id: "documents", icon: <FileText size={18} />, label: "Documents", href: "/dashboard/recruiter/documents" },
     { id: "calendar", icon: <Calendar size={18} />, label: "Calendar", href: "/dashboard/recruiter/calendar" },
     { id: "saved", icon: <Star size={18} />, label: "Saved Jobs", href: "/dashboard/recruiter/saved" },
   ];
-  
+
   const isActive = (href) => pathname === href;
-  
+
   return (
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={onClose}
         />
       )}
-      
+
       {/* Sidebar - starts below navbar on desktop */}
       <div className={`
         fixed top-0 left-0 z-50 h-full w-64 flex flex-col bg-[#050816] text-white border-r border-white/10
@@ -116,18 +119,18 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
           <div className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-violet-600/5 blur-3xl" />
           <div className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-fuchsia-600/5 blur-3xl" />
         </div>
-        
+
         <div className="relative z-10 flex h-full flex-col min-h-0">
           {/* Close button for mobile */}
           <div className="flex h-16 items-center justify-end border-b border-white/10 px-4 lg:hidden shrink-0">
-            <button 
+            <button
               onClick={onClose}
               className="rounded-lg p-1 hover:bg-white/10"
             >
               <X size={20} />
             </button>
           </div>
-          
+
           {/* Navigation - Scrollable */}
           <div className="flex-1 overflow-y-auto px-3 py-6 min-h-0">
             <div className="space-y-1">
@@ -143,9 +146,9 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
                 />
               ))}
             </div>
-            
+
             <SectionDivider label="Your Activity" />
-            
+
             <div className="space-y-1">
               {secondNavItems.map((item) => (
                 <NavItem
@@ -158,9 +161,9 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
                 />
               ))}
             </div>
-            
+
             <SectionDivider label="Account" />
-            
+
             <div className="space-y-1">
               {settingsNavItems.map((item) => (
                 <NavItem
@@ -173,7 +176,7 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
                 />
               ))}
             </div>
-            
+
             {/* Upgrade Card */}
             <div className="mt-6 rounded-xl bg-linear-to-br from-fuchsia-500/10 to-violet-600/10 p-4 border border-fuchsia-500/20">
               <div className="flex items-center gap-2">
@@ -187,7 +190,7 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
                 Upgrade Now
               </button>
             </div>
-            
+
             {/* Extra space at bottom */}
             <div className="h-12" />
           </div>

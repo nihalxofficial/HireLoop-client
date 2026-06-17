@@ -222,7 +222,7 @@ export default function Navbar() {
                         Settings
                       </Link>
                       <Link
-                        href={`/dashboard/${user?.role}/profile"`}
+                        href={`/profile/${user?.id}`}
                         onClick={() => setIsDropdownOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
                       >
@@ -348,7 +348,7 @@ export default function Navbar() {
                         Settings
                       </Link>
                       <Link
-                        href={`/dashboard/${user?.role}/profile`}
+                        href={`/profile/${user?.id}`}
                         onClick={() => {
                           setIsDropdownOpen(false);
                           setIsOpen(false);
