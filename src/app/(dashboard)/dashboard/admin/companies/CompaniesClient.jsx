@@ -293,7 +293,7 @@ export default function CompaniesClient({ initialCompanies }) {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <div className="w-[150px]">
+            <div className="w-37.5">
               <Select
                 className="w-full"
                 value={statusFilter}
@@ -352,7 +352,7 @@ export default function CompaniesClient({ initialCompanies }) {
               </Select>
             </div>
 
-            <div className="w-[150px]">
+            <div className="w-37.5">
               <Select
                 className="w-full"
                 value={sortBy}

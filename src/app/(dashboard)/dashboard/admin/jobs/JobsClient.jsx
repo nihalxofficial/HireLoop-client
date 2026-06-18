@@ -1,4 +1,3 @@
-// app/dashboard/admin/jobs/JobsClient.js
 "use client";
 
 import React, { useState } from "react";
@@ -43,6 +42,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { updateJobStatus } from "@/lib/actions/jobs";
 
 // Helper function to get initials from name
 const getInitials = (name) => {
@@ -128,7 +128,7 @@ export default function JobsClient({ initialJobs }) {
 
   // Handle status change - ready for API integration
   const handleStatusChange = async (jobId, newStatus) => {
-    setUpdatingStatus(jobId);
+    setUpdatingStatus(jobId); 
     
     try {
       const job = jobs.find(j => j._id === jobId);
@@ -137,15 +137,16 @@ export default function JobsClient({ initialJobs }) {
       setJobs(jobs.map(j => 
         j._id === jobId ? { ...j, status: newStatus } : j
       ));
+
+      const data = {
+        status: newStatus
+      }
+
+      const result = await updateJobStatus(jobId, data);
+      if(result.modifiedCount>0){
+        toast.success(`Job status updated to ${STATUS_CONFIG[newStatus]?.label || newStatus}`);
+      }
       
-      toast.success(`Job status updated to ${STATUS_CONFIG[newStatus]?.label || newStatus}`);
-      
-      // API Call - Replace with your actual API endpoint
-      // const response = await fetch(`/api/admin/jobs/${jobId}/status`, {
-      //   method: 'PATCH',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ status: newStatus }),
-      // });
       
     } catch (error) {
       console.error('Error updating job status:', error);

@@ -4,12 +4,12 @@ import { serverMutation } from "../core/server";
 
 const Api = process.env.NEXT_PUBLIC_API;
 
-export const addCompany = async(jobData)=>{
-    return serverMutation("/companies", jobData) 
+export const addCompany = async(companyData)=>{
+    return serverMutation("/companies", companyData) 
 }
 
-export const updateCompany = async(id, jobData)=>{
-    return serverMutation(`/companies/${id}`, jobData, "PATCH");
+export const updateCompany = async(id, companyData)=>{
+    return serverMutation(`/companies/${id}`, companyData, "PATCH");
 }
 export const deleteCompany = async( id)=>{
     const res = await fetch(`${Api}/companies/${id}`,{

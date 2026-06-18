@@ -6,8 +6,8 @@ export const addJob = async(jobData)=>{
     return serverMutation("/jobs", jobData)
 }
 
-export const updateJobStatus = async()=>{
-    pass
+export const updateJobStatus = async(id, jobData, )=>{
+    return serverMutation(`/jobs/${id}`, jobData, "PATCH")
 }
 export const deleteJob = async()=>{
     pass
