@@ -41,6 +41,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { updateCompany } from "@/lib/actions/companies";
 
 // Helper function to get initials from name
 const getInitials = (name) => {
@@ -130,36 +131,21 @@ export default function CompaniesClient({ initialCompanies }) {
       setCompanies(companies.map(c => 
         c._id === companyId ? { ...c, status: newStatus } : c
       ));
-      
+
+      const data = {
+        status: newStatus
+      }      
+      const result = await updateCompany(companyId, data);
+      if(result.modifiedCount>0){
+        toast.success(`Company ${newStatus === 'approved' ? 'approved' : 'rejected'} successfully`);
+      }
       // Show success toast
-      toast.success(`Company ${newStatus === 'approved' ? 'approved' : 'rejected'} successfully`);
       
-      // API Call - Replace with your actual API endpoint
-      // const response = await fetch(`/api/admin/companies/${companyId}/status`, {
-      //   method: 'PATCH',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ 
-      //     status: newStatus,
-      //     updatedBy: 'admin'
-      //   }),
-      // });
       
-      // if (!response.ok) {
-      //   throw new Error('Failed to update company status');
-      // }
-      
-      // const result = await response.json();
-      
-      // If you want to update with server response
-      // setCompanies(companies.map(c => 
-      //   c._id === companyId ? { ...c, status: result.status, updatedAt: result.updatedAt } : c
-      // ));
       
     } catch (error) {
       // Revert on error
-      console.error('Error updating company status:', error);
+      console.log('Error updating company status:', error);
       
       // Find the company and revert its status
       const company = companies.find(c => c._id === companyId);
@@ -236,7 +222,7 @@ export default function CompaniesClient({ initialCompanies }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
+          <Button className="bg-linear-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300">
             <UserPlus size={16} />
             Add Company
           </Button>
@@ -516,13 +502,13 @@ export default function CompaniesClient({ initialCompanies }) {
                                   e.target.style.display = 'none';
                                   const parent = e.target.parentElement;
                                   const div = document.createElement('div');
-                                  div.className = 'w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-xs font-semibold ring-1 ring-white/10';
+                                  div.className = 'w-10 h-10 rounded-lg flex items-center justify-center bg-linear-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-xs font-semibold ring-1 ring-white/10';
                                   div.textContent = getInitials(company.name);
                                   parent.appendChild(div);
                                 }}
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-xs font-semibold ring-1 ring-white/10">
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-linear-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-xs font-semibold ring-1 ring-white/10">
                                 {getInitials(company.name)}
                               </div>
                             )}

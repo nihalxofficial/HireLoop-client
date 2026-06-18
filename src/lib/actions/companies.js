@@ -8,16 +8,8 @@ export const addCompany = async(jobData)=>{
     return serverMutation("/companies", jobData) 
 }
 
-export const editCompany = async(jobData, id)=>{
-    const res = await fetch(`${Api}/companies/${id}`,{
-        method: "PATCH",
-        headers: {
-            "Content-Type" : "application/json"
-        },
-        body: JSON.stringify(jobData)
-    })
-    const data = await res.json();
-    return data;
+export const updateCompany = async(id, jobData)=>{
+    return serverMutation(`/companies/${id}`, jobData, "PATCH");
 }
 export const deleteCompany = async( id)=>{
     const res = await fetch(`${Api}/companies/${id}`,{
