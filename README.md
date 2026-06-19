@@ -16,6 +16,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - Canvas-confetti
 - Stripe
 - Date-fns
+- Rechart
+- JWT
 
 First, run the development server:
 
