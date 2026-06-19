@@ -135,7 +135,7 @@ export default function ContactClient({ contactInfo, socialLinks }) {
             Contact Us
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Have questions or need support? We're here to help. Reach out to us through any of the channels below.
+            Have questions or need support? We&apos;re here to help. Reach out to us through any of the channels below.
           </p>
         </div>
 
