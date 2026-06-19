@@ -2,9 +2,9 @@
 
 # HireLoop — Client
 
-**A modern job platform connecting top talent with world-class companies.**
+**A full-featured job hunting portal bridging the gap between job seekers and employers.**
 
-Browse thousands of curated opportunities, manage applications, and accelerate your career — all in one place.
+HireLoop streamlines job discovery, application management, and company recruitment — all in one platform. It offers smart job search, company profiles, subscription-based premium features and a complete recruiter toolkit.
 
 | | |
 |---|---|
@@ -16,28 +16,110 @@ Browse thousands of curated opportunities, manage applications, and accelerate y
 
 ---
 
-## Features
+## User Roles
 
-### 👤 For Job Seekers
-| Feature | Description |
+| Role | Description |
 |---|---|
-| Smart Job Search | Advanced filters by role, location, salary, and more |
-| One-Click Apply | Streamlined application flow |
-| Saved Jobs | Bookmark and manage favorite listings from your dashboard |
-| Application History | Track every application status in one place |
-| Interview Calendar | Manage upcoming interviews and schedules |
-| Notifications | Real-time alerts for new matches and application updates |
-| Salary Insights | Real salary data to negotiate confidently |
-| Resume Builder | Create professional resumes with modern templates |
-| Skill-Based Matching | Discover jobs that fit your experience |
+| 👤 **Seeker** | Browse jobs, apply, save listings, track applications, manage subscription |
+| 🏢 **Recruiter** | Register company, post jobs, review applicants, manage billing |
+| 🛠️ **Admin** | Approve companies, moderate jobs, manage users, view platform analytics |
 
-### 🏢 For Recruiters
-| Feature | Description |
+---
+
+## Public Pages
+
+| Page | Description |
 |---|---|
-| Job Posting | Create and manage job listings with ease |
-| Company Profiles | Showcase your brand to attract top candidates |
-| Candidate Management | Review and track applicants |
-| Subscription Plans | Tiered pricing (Starter / Growth / Premium) with Stripe |
+| `/` | Hero section, live stats, featured jobs, platform features, footer |
+| `/jobs` | Job search with keyword + filter sidebar (type, location, salary, category) |
+| `/jobs/:jobId` | Full job details, company card, apply button, similar jobs |
+| `/companies` | All approved companies in card grid, filterable by industry |
+| `/pricing` | Seeker & Recruiter plans side-by-side with FAQ accordion |
+| `/contact` | Contact form |
+
+---
+
+## Dashboard Features
+
+### 👤 Seeker Dashboard
+
+| Page | Description |
+|---|---|
+| `/dashboard/seeker` | Stats row, profile card, application status chart (Recharts), recent activity |
+| `/dashboard/seeker/jobs` | Full job search + save + apply with modal |
+| `/dashboard/seeker/saved` | Bookmarked jobs with remove & apply actions |
+| `/dashboard/seeker/applications` | All applications with status tracking (Applied → Offered) |
+| `/dashboard/seeker/billing` | Current plan, usage, payment history, Stripe upgrade |
+| `/dashboard/seeker/settings` | Update profile, resume upload, skills, bio |
+
+### 🏢 Recruiter Dashboard
+
+| Page | Description |
+|---|---|
+| `/dashboard/recruiter` | Stats row, company card, applicants bar chart (Recharts), recent applications |
+| `/dashboard/recruiter/company` | Register/edit company, status badge (Pending / Approved / Rejected) |
+| `/dashboard/recruiter/jobs` | Manage all job posts with plan usage indicator |
+| `/dashboard/recruiter/jobs/new` | Post new job (gated by company approval + plan limit) |
+| `/dashboard/recruiter/jobs/:jobId/applicants` | Review applicants, update status, trigger email notification |
+| `/dashboard/recruiter/billing` | Current plan, active job usage, payment history, Stripe upgrade |
+| `/dashboard/recruiter/settings` | Update personal info, link to company page |
+
+### 🛠️ Admin Dashboard
+
+| Page | Description |
+|---|---|
+| `/dashboard/admin` | Platform stats, job category chart, user growth chart, recent payments |
+| `/dashboard/admin/users` | Search, filter by role, change role, suspend/activate accounts |
+| `/dashboard/admin/companies` | Approve or reject company registrations |
+| `/dashboard/admin/jobs` | Search, filter, view, and remove any job listing |
+| `/dashboard/admin/payments` | All subscription payments, revenue summary cards |
+| `/dashboard/admin/settings` | Update admin profile |
+
+---
+
+## Subscription Plans
+
+### Seeker Plans
+
+| Plan | Price | Applications | Saved Jobs | Extras |
+|---|---|---|---|---|
+| Free | $0 | 3 / month | Up to 10 | Basic profile, email alerts |
+| Pro | $19/mo | 30 / month | Unlimited | Application tracking, salary insights |
+| Premium | $39/mo | Unlimited | Unlimited | Profile boost, early access, priority support |
+
+### Recruiter Plans
+
+| Plan | Price | Active Job Posts | Analytics | Extras |
+|---|---|---|---|---|
+| Free | $0 | Up to 3 | ✗ | Basic applicant management |
+| Growth | $49/mo | Up to 10 | Basic | Applicant tracking, email support |
+| Enterprise | $149/mo | Up to 50 | Advanced | Featured listings, team collaboration, custom branding |
+
+---
+
+## Application Status Flow
+
+```
+Job Posted → Seeker Applies → Under Review → Shortlisted → Offered / Rejected
+```
+
+| Status | Description |
+|---|---|
+| Applied | Seeker has submitted an application |
+| Under Review | Recruiter has started reviewing |
+| Shortlisted | Candidate shortlisted for interview |
+| Rejected | Application declined |
+| Offered | Candidate received a job offer |
+
+---
+
+## Company Status Flow
+
+| Status | Description |
+|---|---|
+| Pending | Submitted, awaiting admin review |
+| Approved | Verified and publicly visible |
+| Rejected | Declined by admin |
 
 ---
 
@@ -63,12 +145,12 @@ Browse thousands of curated opportunities, manage applications, and accelerate y
 
 ### Prerequisites
 
-| Requirement | Version |
+| Requirement | Notes |
 |---|---|
-| Node.js | 18+ |
-| MongoDB Atlas | Account required |
-| Stripe | Account required |
-| Better Auth | Configured instance |
+| Node.js 18+ | Required |
+| MongoDB Atlas | Database |
+| Stripe Account | Payment processing |
+| Better Auth | Authentication |
 
 ### Installation
 
@@ -95,10 +177,30 @@ MONGODB_URI=mongodb+srv://...
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start development server at localhost:3000 |
+| `npm run dev` | Start dev server at localhost:3000 |
 | `npm run build` | Create production build |
 | `npm start` | Start production server |
 | `npm run lint` | Run ESLint |
+
+---
+
+## Project Structure
+
+```
+app/
+├── (main)/                   # Public pages
+│   ├── page.tsx              # Home
+│   ├── jobs/                 # Browse jobs + job details
+│   ├── companies/            # Company listings
+│   ├── pricing/              # Pricing page
+│   └── contact/              # Contact page
+├── dashboard/
+│   ├── seeker/               # Seeker dashboard pages
+│   ├── recruiter/            # Recruiter dashboard pages
+│   └── admin/                # Admin dashboard pages
+├── auth/                     # Login / Register
+└── api/                      # API routes (Stripe checkout, webhooks)
+```
 
 ---
 
