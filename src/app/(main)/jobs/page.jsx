@@ -1,17 +1,34 @@
+// app/jobs/page.js
 import { getJobs } from '@/lib/api/jobs';
-import React from 'react';
-import JobClient from './jobClient';
-import { getCompanies, getCompanyById } from '@/lib/api/companies';
+import { getCompanies } from '@/lib/api/companies';
+import JobClient from './JobClient';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 
-const AllJobsPage = async() => {
-    const jobs = await getJobs();
-    const companies = await getCompanies();
-    // const companyDetails = await getCompanyById();
-    return (
-        <div>
-            <JobClient initialJobs={jobs} companies={companies} />
-        </div>
-    );
-};
+async function getJobsData() {
+  try {
+    const [jobs, companies] = await Promise.all([
+      getJobs(),
+      getCompanies()
+    ]);
+    
+    return { jobs: jobs || [], companies: companies || [] };
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
+    return { jobs: [], companies: [] };
+  }
+}
 
-export default AllJobsPage;
+export default async function JobsPage() {
+  const { jobs, companies } = await getJobsData();
+  
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 size={48} className="text-violet-400 animate-spin" />
+      </div>
+    }>
+      <JobClient initialJobs={jobs} companies={companies} />
+    </Suspense>
+  );
+}

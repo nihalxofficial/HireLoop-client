@@ -5,7 +5,7 @@ import { Button, Input, TextArea, Select, ListBox, Modal, Label, Surface } from 
 import { Building2, Globe, MapPin, Users, Mail, Plus, Edit, Trash2, Eye, CheckCircle, XCircle, Clock, BriefcaseBusiness, Building, Upload, X, Calendar, Loader2, ImageIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { addCompany, editCompany, deleteCompany } from "@/lib/actions/companies";
+import { addCompany, updateCompany, deleteCompany } from "@/lib/actions/companies";
 import { getRecruiterCompanies } from "@/lib/api/companies";
 import { toast } from "react-toastify";
 import CompanyCard from "@/components/shared/CompanyCard";
@@ -409,7 +409,7 @@ export const CompaniesPageClient = ({ recruiter, initialCompanies }) => {
     const handleSave = async (formData) => {
         try {
             if (isEditing) {
-                const result = await editCompany(formData, selectedCompany._id);
+                const result = await updateCompany(formData, selectedCompany._id);
                 if (result) {
                     setCompanies((prev) =>
                         prev.map((c) =>

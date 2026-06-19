@@ -1,13 +1,14 @@
-// app/jobs/jobClient.jsx
+// app/jobs/JobClient.js
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Select, ListBox, Button } from "@heroui/react";
-import { BriefcaseBusiness, Search, Filter, X, SlidersHorizontal } from 'lucide-react';
+import { BriefcaseBusiness, Search, Filter, X, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import JobCard from '@/components/shared/JobCard';
 
-const JobClient = ({ initialJobs, companies }) => {
+// Wrap the component that uses useSearchParams
+function JobClientContent({ initialJobs, companies }) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -38,7 +39,6 @@ const JobClient = ({ initialJobs, companies }) => {
     const filterJobs = () => {
         let filtered = [...initialJobs];
 
-        // Search filter
         if (searchTerm) {
             filtered = filtered.filter(job =>
                 job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -47,17 +47,14 @@ const JobClient = ({ initialJobs, companies }) => {
             );
         }
 
-        // Category filter
         if (selectedCategory !== "all") {
             filtered = filtered.filter(job => job.category === selectedCategory);
         }
 
-        // Job Type filter
         if (selectedJobType !== "all") {
             filtered = filtered.filter(job => job.type === selectedJobType);
         }
 
-        // Location filter
         if (selectedLocation !== "all") {
             if (selectedLocation === "Remote") {
                 filtered = filtered.filter(job => job.isRemote === true);
@@ -66,7 +63,6 @@ const JobClient = ({ initialJobs, companies }) => {
             }
         }
 
-        // Salary filter
         if (salaryMin > 0) {
             filtered = filtered.filter(job => job.salaryMin >= salaryMin);
         }
@@ -74,7 +70,6 @@ const JobClient = ({ initialJobs, companies }) => {
             filtered = filtered.filter(job => job.salaryMax <= salaryMax);
         }
 
-        // Company filter
         if (selectedCompany !== "all") {
             filtered = filtered.filter(job => job.companyId === selectedCompany);
         }
@@ -92,7 +87,7 @@ const JobClient = ({ initialJobs, companies }) => {
             salaryMin,
             salaryMax,
             company: selectedCompany,
-            ...overrides, // <-- new value wins over stale state
+            ...overrides,
         };
 
         const params = new URLSearchParams();
@@ -109,7 +104,6 @@ const JobClient = ({ initialJobs, companies }) => {
 
         setSearchTerm(current.search);
 
-        // Filter using current values, not stale state
         let filtered = [...initialJobs];
         if (current.search) {
             filtered = filtered.filter(job =>
@@ -131,12 +125,10 @@ const JobClient = ({ initialJobs, companies }) => {
         setJobs(filtered);
     };
 
-    // Handle search button click
     const handleSearch = () => {
         updateURLAndFilter({ search: tempSearch });
     };
 
-    // Handle filter changes — pass new value as override directly
     const handleCategoryChange = (value) => {
         setSelectedCategory(value);
         updateURLAndFilter({ category: value });
@@ -163,7 +155,6 @@ const JobClient = ({ initialJobs, companies }) => {
         updateURLAndFilter({ company: value });
     };
 
-    // Clear all filters
     const clearFilters = () => {
         setTempSearch("");
         setSearchTerm("");
@@ -181,13 +172,11 @@ const JobClient = ({ initialJobs, companies }) => {
         }, 0);
     };
 
-    // Initial filter on component mount
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         filterJobs();
-    }, []);
+    }, [filterJobs]);
 
-    // Extract unique values for filters from initialJobs
     const categories = ["all", ...new Set(initialJobs.map(job => job.category).filter(Boolean))];
     const jobTypes = ["all", ...new Set(initialJobs.map(job => job.type).filter(Boolean))];
     const locationOptions = ["all", "Remote", "On-site"];
@@ -244,7 +233,6 @@ const JobClient = ({ initialJobs, companies }) => {
                 {/* Search and Category Filter Bar */}
                 <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 mb-6">
                     <div className="flex flex-col sm:flex-row gap-4 md:items-center">
-                        {/* Search Input */}
                         <div className="flex-2">
                             <div className="relative">
                                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -259,12 +247,11 @@ const JobClient = ({ initialJobs, companies }) => {
                             </div>
                         </div>
 
-                        {/* Category Select — FIXED: value/onChange instead of selectedKeys/onSelectionChange */}
                         <div className="flex-1">
                             <Select
                                 className="w-full"
                                 value={selectedCategory}
-                                onChange={(value) => handleCategoryChange(value)}
+                                onChange={handleCategoryChange}
                                 variant="bordered"
                                 aria-label="Filter by category"
                                 classNames={{
@@ -300,7 +287,6 @@ const JobClient = ({ initialJobs, companies }) => {
                             </Select>
                         </div>
 
-                        {/* Search Button */}
                         <button
                             onClick={handleSearch}
                             className="rounded-xl cursor-pointer bg-linear-to-r from-fuchsia-500 to-violet-600 px-6 py-2.5 text-white text-sm font-medium hover:scale-[1.02] transition-all"
@@ -334,7 +320,7 @@ const JobClient = ({ initialJobs, companies }) => {
                                 </div>
 
                                 <div className="max-h-[calc(100vh-200px)] overflow-y-auto px-5 py-4 space-y-5">
-                                    {/* Job Type Filter - Radio Buttons */}
+                                    {/* Job Type Filter */}
                                     <div>
                                         <h4 className="text-sm font-medium text-white mb-3">Job Type</h4>
                                         <div className="space-y-2">
@@ -356,7 +342,7 @@ const JobClient = ({ initialJobs, companies }) => {
                                         </div>
                                     </div>
 
-                                    {/* Location Filter - Radio Buttons */}
+                                    {/* Location Filter */}
                                     <div>
                                         <h4 className="text-sm font-medium text-white mb-3">Location</h4>
                                         <div className="space-y-2">
@@ -398,7 +384,7 @@ const JobClient = ({ initialJobs, companies }) => {
                                         </div>
                                     </div>
 
-                                    {/* Company Filter - Radio Buttons */}
+                                    {/* Company Filter */}
                                     <div>
                                         <h4 className="text-sm font-medium text-white mb-3">Company</h4>
                                         <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
@@ -424,7 +410,7 @@ const JobClient = ({ initialJobs, companies }) => {
                         </div>
                     </div>
 
-                    {/* Mobile Sidebar Overlay */}
+                    {/* Mobile Sidebar */}
                     {isSidebarOpen && (
                         <>
                             <div className="fixed inset-0 z-40 bg-black/70 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
@@ -562,6 +548,17 @@ const JobClient = ({ initialJobs, companies }) => {
             </div>
         </div>
     );
-};
+}
 
-export default JobClient;
+// Wrap the component with Suspense for useSearchParams
+export default function JobClient({ initialJobs, companies }) {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <Loader2 size={48} className="text-violet-400 animate-spin" />
+            </div>
+        }>
+            <JobClientContent initialJobs={initialJobs} companies={companies} />
+        </Suspense>
+    );
+}
