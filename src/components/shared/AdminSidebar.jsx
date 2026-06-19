@@ -91,9 +91,9 @@ export default function AdminSidebar({ isOpen, onClose }) {
   ];
   
   const settingsNavItems = [
+    { id: "database", icon: <Database size={18} />, label: "Database", href: "/dashboard/admin/database" },
     { id: "profile", icon: <User size={18} />, label: "Profile", href: `/profile` },
     { id: "settings", icon: <Settings size={18} />, label: "Settings", href: "/dashboard/admin/settings" },
-    { id: "database", icon: <Database size={18} />, label: "Database", href: "/dashboard/admin/database" },
   ];
   
   const isActive = (href) => pathname === href;
