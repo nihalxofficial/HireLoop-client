@@ -7,7 +7,7 @@ import {
   Input,
   Select,
   ListBox,
-  Textarea,
+  TextArea,
 } from "@heroui/react";
 import {
   Mail,
@@ -202,6 +202,7 @@ export default function ContactClient({ contactInfo, socialLinks }) {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Row 1: Full Name & Email - Side by Side */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1.5">
@@ -214,6 +215,7 @@ export default function ContactClient({ contactInfo, socialLinks }) {
                         placeholder="Enter your full name"
                         variant="bordered"
                         required
+                        fullWidth
                         classNames={{
                           input: "text-white placeholder:text-gray-500",
                           inputWrapper: [
@@ -242,6 +244,7 @@ export default function ContactClient({ contactInfo, socialLinks }) {
                         placeholder="Enter your email"
                         variant="bordered"
                         required
+                        fullWidth
                         classNames={{
                           input: "text-white placeholder:text-gray-500",
                           inputWrapper: [
@@ -260,88 +263,93 @@ export default function ContactClient({ contactInfo, socialLinks }) {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1.5">
-                      Subject *
-                    </label>
-                    <Input
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      placeholder="Enter subject"
-                      variant="bordered"
-                      required
-                      classNames={{
-                        input: "text-white placeholder:text-gray-500",
-                        inputWrapper: [
-                          "border-white/10",
-                          "bg-white/5",
-                          "hover:border-violet-500/50",
-                          "focus-within:border-violet-500",
-                          "focus-within:ring-1",
-                          "focus-within:ring-violet-500/30",
-                          "rounded-xl",
-                          "transition-all",
-                          "duration-200",
-                        ],
-                      }}
-                    />
+                  {/* Row 2: Subject & Category - Side by Side */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                        Subject *
+                      </label>
+                      <Input
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleInputChange}
+                        placeholder="Enter subject"
+                        variant="bordered"
+                        required
+                        fullWidth
+                        classNames={{
+                          input: "text-white placeholder:text-gray-500",
+                          inputWrapper: [
+                            "border-white/10",
+                            "bg-white/5",
+                            "hover:border-violet-500/50",
+                            "focus-within:border-violet-500",
+                            "focus-within:ring-1",
+                            "focus-within:ring-violet-500/30",
+                            "rounded-xl",
+                            "transition-all",
+                            "duration-200",
+                          ],
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                        Category *
+                      </label>
+                      <Select
+                        name="category"
+                        value={formData.category}
+                        onChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                        variant="bordered"
+                        required
+                        fullWidth
+                        classNames={{
+                          trigger: [
+                            "border-white/10",
+                            "bg-white/5",
+                            "hover:border-violet-500/50",
+                            "data-[focus=true]:border-violet-500",
+                            "data-[focus=true]:ring-1",
+                            "data-[focus=true]:ring-violet-500/30",
+                            "rounded-xl",
+                            "h-10",
+                            "transition-all",
+                            "duration-200",
+                          ],
+                          value: "text-white",
+                          placeholder: "text-gray-500",
+                        }}
+                      >
+                        <Select.Trigger>
+                          <Select.Value />
+                          <Select.Indicator className="text-gray-400" />
+                        </Select.Trigger>
+                        <Select.Popover>
+                          <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
+                            {categories.map((category) => (
+                              <ListBox.Item
+                                key={category.id}
+                                id={category.id}
+                                textValue={category.label}
+                                className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
+                              >
+                                {category.label}
+                                <ListBox.ItemIndicator className="text-violet-400" />
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1.5">
-                      Category *
-                    </label>
-                    <Select
-                      name="category"
-                      value={formData.category}
-                      onChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-                      variant="bordered"
-                      required
-                      classNames={{
-                        trigger: [
-                          "border-white/10",
-                          "bg-white/5",
-                          "hover:border-violet-500/50",
-                          "data-[focus=true]:border-violet-500",
-                          "data-[focus=true]:ring-1",
-                          "data-[focus=true]:ring-violet-500/30",
-                          "rounded-xl",
-                          "h-10",
-                          "transition-all",
-                          "duration-200",
-                        ],
-                        value: "text-white",
-                        placeholder: "text-gray-500",
-                      }}
-                    >
-                      <Select.Trigger>
-                        <Select.Value />
-                        <Select.Indicator className="text-gray-400" />
-                      </Select.Trigger>
-                      <Select.Popover>
-                        <ListBox className="bg-[#0a0f1a] border border-white/10 rounded-xl shadow-2xl">
-                          {categories.map((category) => (
-                            <ListBox.Item
-                              key={category.id}
-                              id={category.id}
-                              textValue={category.label}
-                              className="text-white data-[hover=true]:bg-violet-500/20 data-[hover=true]:text-white data-[selected=true]:text-violet-400 data-[selected=true]:bg-violet-500/10 rounded-lg m-1 transition-all duration-200"
-                            >
-                              {category.label}
-                              <ListBox.ItemIndicator className="text-violet-400" />
-                            </ListBox.Item>
-                          ))}
-                        </ListBox>
-                      </Select.Popover>
-                    </Select>
-                  </div>
-
+                  {/* Row 3: Message - Full Width */}
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-1.5">
                       Message *
                     </label>
-                    <Textarea
+                    <TextArea
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
@@ -349,6 +357,7 @@ export default function ContactClient({ contactInfo, socialLinks }) {
                       variant="bordered"
                       required
                       minRows={4}
+                      fullWidth
                       classNames={{
                         input: "text-white placeholder:text-gray-500",
                         inputWrapper: [
@@ -370,7 +379,8 @@ export default function ContactClient({ contactInfo, socialLinks }) {
                   <Button
                     type="submit"
                     isLoading={loading}
-                    className="w-full bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
+                    fullWidth
+                    className="bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02] transition-all duration-300"
                   >
                     <Send size={16} />
                     Send Message
