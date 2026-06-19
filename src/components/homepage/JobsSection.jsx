@@ -38,7 +38,7 @@ const formatRelativeDate = (dateString) => {
   const date = new Date(dateString);
   const now = new Date();
   const diff = now - date;
-  
+
   if (diff < 60000) return "Just now";
   if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
   if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
@@ -93,7 +93,7 @@ export default function JobsSection() {
 
         setCompanies(companiesData || []);
 
-        const activeJobs = jobsData?.filter(job => 
+        const activeJobs = jobsData?.filter(job =>
           job.status?.toLowerCase() === 'active'
         ) || [];
 
@@ -256,7 +256,7 @@ export default function JobsSection() {
               >
                 {/* Featured Badge for first job */}
                 {index === 0 && (
-                  <div className="absolute -top-2 -right-2 px-3 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white text-[10px] font-medium shadow-lg shadow-violet-500/30">
+                  <div className="absolute -top-2 -right-2 px-3 py-1 rounded-full bg-linear-to-r from-fuchsia-500 to-violet-600 text-white text-[10px] font-medium shadow-lg shadow-violet-500/30">
                     <Sparkles size={10} className="inline mr-1" />
                     Featured
                   </div>
@@ -286,13 +286,13 @@ export default function JobsSection() {
                           e.target.style.display = 'none';
                           const parent = e.target.parentElement;
                           const div = document.createElement('div');
-                          div.className = 'w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-sm font-semibold ring-2 ring-violet-500/30';
+                          div.className = 'w-12 h-12 rounded-xl flex items-center justify-center bg-linear-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-sm font-semibold ring-2 ring-violet-500/30';
                           div.textContent = getInitials(job.companyName);
                           parent.appendChild(div);
                         }}
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-sm font-semibold ring-2 ring-violet-500/30">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-linear-to-br from-violet-500/20 to-fuchsia-500/20 text-white text-sm font-semibold ring-2 ring-violet-500/30">
                         {getInitials(job.companyName)}
                       </div>
                     )}
@@ -368,12 +368,12 @@ export default function JobsSection() {
 
         {/* Bottom Button */}
         <div className="mt-14 flex justify-center">
-          <Link href="/jobs">
-            <Button className="h-11 cursor-pointer rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-600 px-6 text-sm font-medium text-white shadow-lg shadow-violet-500/20 transition-all duration-300 hover:scale-105">
+          <Button className="h-11 cursor-pointer rounded-xl bg-linear-to-r from-fuchsia-500 to-violet-600 px-6 text-sm font-medium text-white shadow-lg shadow-violet-500/20 transition-all duration-300 hover:scale-105">
+            <Link href="/jobs" className="flex items-center gap-2">
               View all job openings
               <ArrowUpRight size={16} className="ml-1" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
