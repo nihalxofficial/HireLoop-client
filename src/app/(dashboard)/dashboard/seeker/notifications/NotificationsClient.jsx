@@ -472,7 +472,7 @@ export default function NotificationsClient({ initialNotifications, initialStats
                     {!notification.read && (
                       <button
                         onClick={() => markAsRead(notification.id)}
-                        className="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1"
+                        className="text-xs cursor-pointer text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1"
                       >
                         <Check size={12} />
                         Mark as read
@@ -480,7 +480,7 @@ export default function NotificationsClient({ initialNotifications, initialStats
                     )}
                     {notification.link && (
                       <Link href={notification.link}>
-                        <button className="text-xs text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
+                        <button className="text-xs cursor-pointer text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
                           <Eye size={12} />
                           View
                         </button>
@@ -488,7 +488,7 @@ export default function NotificationsClient({ initialNotifications, initialStats
                     )}
                     <button
                       onClick={() => deleteNotification(notification.id)}
-                      className="text-xs text-red-400 hover:text-red-300 transition-colors flex items-center gap-1"
+                      className="text-xs cursor-pointer text-red-400 hover:text-red-300 transition-colors flex items-center gap-1"
                     >
                       <Trash2 size={12} />
                       Delete
