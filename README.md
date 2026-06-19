@@ -3,6 +3,8 @@
 **HireLoop** is a modern job platform that connects top talent with world-class companies. Browse thousands of curated opportunities, manage applications, and accelerate your career — all in one place.
 
 🔗 **Live:** [hireloop-client-theta.vercel.app](https://hireloop-client-theta.vercel.app)
+📦 **Client Repo:** [github.com/nihalxofficial/HireLoop-client](https://github.com/nihalxofficial/HireLoop-client)
+🔧 **Server Repo:** [github.com/nihalxofficial/HireLoop-server](https://github.com/nihalxofficial/HireLoop-server)
 
 ---
 
