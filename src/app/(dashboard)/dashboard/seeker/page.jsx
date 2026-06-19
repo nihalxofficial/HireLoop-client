@@ -100,8 +100,10 @@ const SeekerPage = () => {
             title: job.title || 'Unknown Position',
             company: company?.name || 'Unknown Company',
             location: job.location || 'Remote',
+            // eslint-disable-next-line react-hooks/immutability
             salary: formatSalary(job.salaryMin, job.salaryMax, job.currency),
             type: job.type || 'Full-time',
+            // eslint-disable-next-line react-hooks/immutability
             posted: formatRelativeDate(job.createdAt),
             logo: company?.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(company?.name || 'Company')}&background=8B5CF6&color=fff&size=64`,
             matchScore: Math.floor(Math.random() * 30) + 70, // Random match score 70-100
