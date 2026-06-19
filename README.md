@@ -1,31 +1,43 @@
+<div align="center">
+
 # HireLoop — Client
 
-**HireLoop** is a modern job platform that connects top talent with world-class companies. Browse thousands of curated opportunities, manage applications, and accelerate your career — all in one place.
+**A modern job platform connecting top talent with world-class companies.**
 
-🔗 **Live:** [hireloop-client-theta.vercel.app](https://hireloop-client-theta.vercel.app)
-📦 **Client Repo:** [github.com/nihalxofficial/HireLoop-client](https://github.com/nihalxofficial/HireLoop-client)
-🔧 **Server Repo:** [github.com/nihalxofficial/HireLoop-server](https://github.com/nihalxofficial/HireLoop-server)
+Browse thousands of curated opportunities, manage applications, and accelerate your career — all in one place.
+
+| | |
+|---|---|
+| 🌐 **Live App** | [hireloop-client-theta.vercel.app](https://hireloop-client-theta.vercel.app) |
+| 📦 **Client Repo** | [github.com/nihalxofficial/HireLoop-client](https://github.com/nihalxofficial/HireLoop-client) |
+| 🔧 **Server Repo** | [github.com/nihalxofficial/HireLoop-server](https://github.com/nihalxofficial/HireLoop-server) |
+
+</div>
 
 ---
 
 ## Features
 
-### For Job Seekers
-- **Smart Job Search** — Advanced filters by role, location, salary, and more
-- **One-Click Apply** — Streamlined application flow
-- **Saved Jobs** — Bookmark and manage favorite listings from your dashboard
-- **Application History** — Track every application status in one place
-- **Interview Calendar** — Manage upcoming interviews and schedules
-- **Notifications** — Real-time alerts for new matches and application updates
-- **Salary Insights** — Real salary data to negotiate confidently
-- **Resume Builder** — Create professional resumes with modern templates
-- **Skill-Based Matching** — Discover jobs that fit your experience
+### 👤 For Job Seekers
+| Feature | Description |
+|---|---|
+| Smart Job Search | Advanced filters by role, location, salary, and more |
+| One-Click Apply | Streamlined application flow |
+| Saved Jobs | Bookmark and manage favorite listings from your dashboard |
+| Application History | Track every application status in one place |
+| Interview Calendar | Manage upcoming interviews and schedules |
+| Notifications | Real-time alerts for new matches and application updates |
+| Salary Insights | Real salary data to negotiate confidently |
+| Resume Builder | Create professional resumes with modern templates |
+| Skill-Based Matching | Discover jobs that fit your experience |
 
-### For Recruiters
-- **Job Posting** — Create and manage job listings with ease
-- **Company Profiles** — Showcase your brand to attract top candidates
-- **Candidate Management** — Review and track applicants
-- **Subscription Plans** — Tiered pricing (Starter / Growth / Premium) with Stripe integration
+### 🏢 For Recruiters
+| Feature | Description |
+|---|---|
+| Job Posting | Create and manage job listings with ease |
+| Company Profiles | Showcase your brand to attract top candidates |
+| Candidate Management | Review and track applicants |
+| Subscription Plans | Tiered pricing (Starter / Growth / Premium) with Stripe |
 
 ---
 
@@ -51,16 +63,18 @@
 
 ### Prerequisites
 
-- Node.js 18+
-- MongoDB Atlas account
-- Stripe account
-- Better Auth setup
+| Requirement | Version |
+|---|---|
+| Node.js | 18+ |
+| MongoDB Atlas | Account required |
+| Stripe | Account required |
+| Better Auth | Configured instance |
 
 ### Installation
 
 ```bash
-git clone https://github.com/nihalxofficial/hireloop-client.git
-cd hireloop-client
+git clone https://github.com/nihalxofficial/HireLoop-client.git
+cd HireLoop-client
 npm install
 ```
 
@@ -77,40 +91,20 @@ BETTER_AUTH_URL=http://localhost:3000
 MONGODB_URI=mongodb+srv://...
 ```
 
-### Run Development Server
+### Scripts
 
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Production Build
-
-```bash
-npm run build
-npm start
-```
-
----
-
-## Project Structure
-
-```
-app/
-├── (main)/           # Public pages (home, jobs, companies, pricing)
-├── dashboard/
-│   ├── seeker/       # Job seeker dashboard (saved, history, calendar, etc.)
-│   └── recruiter/    # Recruiter dashboard (postings, applicants, billing)
-├── auth/             # Login / Register
-└── api/              # API routes (Stripe checkout, etc.)
-```
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server at localhost:3000 |
+| `npm run build` | Create production build |
+| `npm start` | Start production server |
+| `npm run lint` | Run ESLint |
 
 ---
 
 ## Deployment
 
-Deployed on **Vercel**. All environment variables must be added under **Project → Settings → Environment Variables** in the Vercel dashboard.
+Deployed on **Vercel**. Add all environment variables under **Project → Settings → Environment Variables** before deploying.
 
 ```bash
 vercel --prod
