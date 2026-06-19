@@ -261,7 +261,7 @@ export default function AnalyticsClient({ analyticsData }) {
                 {overview.companyName || 'Your Company'}
               </span>
             </div>
-            <h2 className="text-2xl font-semibold text-white">Recruitment Dashboard</h2>
+            <h2 className="text-2xl font-semibold text-white">Recruitment Analytics</h2>
             <p className="text-sm text-gray-400 mt-1">
               {overview.totalJobs || 0} total jobs · {overview.totalApplications || 0} applications · {overview.hireRate || 0}% hire rate
             </p>
