@@ -88,7 +88,6 @@ export default function AdminSidebar({ isOpen, onClose }) {
     { id: "analytics", icon: <BarChart3 size={18} />, label: "Analytics", href: "/dashboard/admin/analytics" },
     { id: "subscriptions", icon: <CreditCard size={18} />, label: "Subscriptions", href: "/dashboard/admin/subscriptions" },
     { id: "reports", icon: <Flag size={18} />, label: "Reports", badge: "3", href: "/dashboard/admin/reports" },
-    { id: "moderation", icon: <Shield size={18} />, label: "Moderation", badge: "12", href: "/dashboard/admin/moderation" },
   ];
   
   const settingsNavItems = [
