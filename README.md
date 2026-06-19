@@ -1,53 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HireLoop — Client
+
+**HireLoop** is a modern job platform that connects top talent with world-class companies. Browse thousands of curated opportunities, manage applications, and accelerate your career — all in one place.
+
+🔗 **Live:** [hireloop-client-theta.vercel.app](https://hireloop-client-theta.vercel.app)
+
+---
+
+## Features
+
+### For Job Seekers
+- **Smart Job Search** — Advanced filters by role, location, salary, and more
+- **One-Click Apply** — Streamlined application flow
+- **Saved Jobs** — Bookmark and manage favorite listings from your dashboard
+- **Application History** — Track every application status in one place
+- **Interview Calendar** — Manage upcoming interviews and schedules
+- **Notifications** — Real-time alerts for new matches and application updates
+- **Salary Insights** — Real salary data to negotiate confidently
+- **Resume Builder** — Create professional resumes with modern templates
+- **Skill-Based Matching** — Discover jobs that fit your experience
+
+### For Recruiters
+- **Job Posting** — Create and manage job listings with ease
+- **Company Profiles** — Showcase your brand to attract top candidates
+- **Candidate Management** — Review and track applicants
+- **Subscription Plans** — Tiered pricing (Starter / Growth / Premium) with Stripe integration
+
+---
+
+## Tech Stack
+
+| Category | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| UI Library | HeroUI |
+| Icons | Gravity Icons, React Icons, Lucide React |
+| Auth | Better Auth (JWT) |
+| Payments | Stripe (Checkout + Subscriptions) |
+| Database | MongoDB Atlas |
+| Charts | Recharts |
+| Notifications | React Toast |
+| Animations | Canvas Confetti |
+| Date Utilities | date-fns |
+| Deployment | Vercel |
+
+---
 
 ## Getting Started
 
-## Tech Stack
-- Next.js
-- HeroUI
-- Gravity Icons
-- React Toast
-- React Icons
-- Gravity Icons
-- Lucide React
-- Better Auth
-- MongoDB
-- MongoDB Atlas
-- Canvas-confetti
-- Stripe
-- Date-fns
-- Rechart
-- JWT
+### Prerequisites
 
-First, run the development server:
+- Node.js 18+
+- MongoDB Atlas account
+- Stripe account
+- Better Auth setup
+
+### Installation
+
+```bash
+git clone https://github.com/nihalxofficial/hireloop-client.git
+cd hireloop-client
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file in the root:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+BETTER_AUTH_SECRET=your_secret
+BETTER_AUTH_URL=http://localhost:3000
+MONGODB_URI=mongodb+srv://...
+```
+
+### Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+├── (main)/           # Public pages (home, jobs, companies, pricing)
+├── dashboard/
+│   ├── seeker/       # Job seeker dashboard (saved, history, calendar, etc.)
+│   └── recruiter/    # Recruiter dashboard (postings, applicants, billing)
+├── auth/             # Login / Register
+└── api/              # API routes (Stripe checkout, etc.)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Deployed on **Vercel**. All environment variables must be added under **Project → Settings → Environment Variables** in the Vercel dashboard.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+vercel --prod
+```
