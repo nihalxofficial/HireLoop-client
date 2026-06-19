@@ -78,8 +78,7 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
     // { id: "add-job", icon: <PlusCircle size={18} />, label: "Post a Job", href: "/dashboard/recruiter/jobs/new" },
     { id: "company", icon: <Building2 size={18} />, label: "Company", href: "/dashboard/recruiter/company" },
     { id: "candidates", icon: <Users size={18} />, label: "Candidates", badge: "12", href: "/dashboard/recruiter/candidates" },
-    { id: "analytics", icon: <BarChart3 size={18} />, label: "Analytics", href: "/dashboard/recruiter/analytics" },
-    { id: "messages", icon: <MessageSquare size={18} />, label: "Messages", badge: "3", href: "/dashboard/recruiter/messages" },
+    
   ];
 
   const settingsNavItems = [
@@ -88,9 +87,10 @@ export default function RecruiterDashboardSidebar({ isOpen, onClose }) {
   ];
 
   const secondNavItems = [
+    { id: "analytics", icon: <BarChart3 size={18} />, label: "Analytics", href: "/dashboard/recruiter/analytics" },
+    { id: "messages", icon: <MessageSquare size={18} />, label: "Messages", badge: "3", href: "/dashboard/recruiter/messages" },
     { id: "documents", icon: <FileText size={18} />, label: "Documents", href: "/dashboard/recruiter/documents" },
     { id: "calendar", icon: <Calendar size={18} />, label: "Calendar", href: "/dashboard/recruiter/calendar" },
-    { id: "saved", icon: <Star size={18} />, label: "Saved Jobs", href: "/dashboard/recruiter/saved" },
   ];
 
   const isActive = (href) => pathname === href;
