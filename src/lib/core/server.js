@@ -1,10 +1,10 @@
 const Api = process.env.NEXT_PUBLIC_API;
 
-export const serverFetch = async(path)=>{
-    const res = await fetch(`${Api}${path}`);
+export const serverFetch = async (path) => {
+    const res = await fetch(`${Api}${path}`, { cache: 'no-store' });
     const data = await res.json();
     return data;
-}
+};
 
 export const serverMutation = async(path, data, method="POST")=>{
     const res = await fetch(`${Api}${path}`,{
