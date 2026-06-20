@@ -1,18 +1,76 @@
 // app/companies/CompaniesClient.jsx
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button, Input, Select, ListBox } from "@heroui/react";
 import { BriefcaseBusiness, Building2, Search, Filter, X, SlidersHorizontal, MapPin, Users, Mail, Calendar, Eye } from "lucide-react";
 import Link from "next/link";
 
+// Skeleton Card Component
+const CompanySkeletonCard = () => {
+    return (
+        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden animate-pulse">
+            {/* Cover Image Skeleton */}
+            <div className="h-32 w-full bg-white/5" />
+            
+            <div className="relative px-5 pb-5">
+                {/* Logo Skeleton */}
+                <div className="flex items-end -mt-10 gap-4">
+                    <div className="relative shrink-0">
+                        <div className="w-16 h-16 rounded-xl ring-4 ring-[#050816] bg-white/10" />
+                    </div>
+                    <div className="flex-1 pb-1 min-w-0 space-y-2">
+                        <div className="h-5 w-3/4 bg-white/10 rounded-lg" />
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <div className="h-3 w-20 bg-white/10 rounded-full" />
+                            <div className="h-3 w-16 bg-white/10 rounded-full" />
+                            <div className="h-3 w-24 bg-white/10 rounded-full" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Email Skeleton */}
+                <div className="flex items-center gap-2 mt-3">
+                    <div className="h-4 w-4 bg-white/10 rounded" />
+                    <div className="h-3 w-48 bg-white/10 rounded" />
+                </div>
+
+                {/* Date Skeleton */}
+                <div className="flex items-center gap-2 mt-1">
+                    <div className="h-4 w-4 bg-white/10 rounded" />
+                    <div className="h-3 w-32 bg-white/10 rounded" />
+                </div>
+
+                {/* Description Skeleton */}
+                <div className="mt-3 space-y-1.5">
+                    <div className="h-3 w-full bg-white/10 rounded" />
+                    <div className="h-3 w-3/4 bg-white/10 rounded" />
+                </div>
+
+                {/* Button Skeleton */}
+                <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/10">
+                    <div className="w-full h-9 rounded-xl bg-white/10" />
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const CompaniesClient = ({ initialCompanies }) => {
     const [companies] = useState(initialCompanies);
     const [searchTerm, setSearchTerm] = useState("");
-    // FIXED: plain string state instead of Set
     const [selectedIndustry, setSelectedIndustry] = useState("all");
     const [selectedLocation, setSelectedLocation] = useState("all");
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    // Simulate loading
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Extract unique values for filters
     const industries = useMemo(() => {
@@ -71,6 +129,56 @@ const CompaniesClient = ({ initialCompanies }) => {
         return map[status] ?? { color: "text-gray-400 bg-gray-500/10 border-gray-500/20", label: status };
     };
 
+    // Show skeleton while loading
+    if (loading) {
+        return (
+            <div className="pt-20 pb-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Page Header Skeleton */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                            <span className="text-[10px] uppercase tracking-[0.28em] text-gray-300">Companies</span>
+                            <div className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                        </div>
+                        <div className="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <div className="h-8 w-48 bg-white/10 rounded-lg animate-pulse" />
+                                <div className="h-4 w-64 bg-white/5 rounded-lg mt-2 animate-pulse" />
+                            </div>
+                            <div className="h-10 w-24 bg-white/10 rounded-xl animate-pulse lg:hidden" />
+                        </div>
+                    </div>
+
+                    {/* Search Bar Skeleton */}
+                    <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 mb-6">
+                        <div className="flex flex-col sm:flex-row gap-4 md:items-center">
+                            <div className="flex-[2]">
+                                <div className="h-10 w-full bg-white/10 rounded-xl animate-pulse" />
+                            </div>
+                            <div className="w-48">
+                                <div className="h-10 w-full bg-white/10 rounded-xl animate-pulse" />
+                            </div>
+                            <div className="w-48">
+                                <div className="h-10 w-full bg-white/10 rounded-xl animate-pulse" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Results Count Skeleton */}
+                    <div className="h-4 w-32 bg-white/10 rounded-lg animate-pulse mb-4" />
+
+                    {/* Companies Grid Skeleton */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[...Array(6)].map((_, index) => (
+                            <CompanySkeletonCard key={index} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="pt-20 pb-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -127,7 +235,7 @@ const CompaniesClient = ({ initialCompanies }) => {
                             />
                         </div>
 
-                        {/* Industry Select — FIXED: value/onChange */}
+                        {/* Industry Select */}
                         <div className="w-48">
                             <Select
                                 className="w-full"
@@ -168,7 +276,7 @@ const CompaniesClient = ({ initialCompanies }) => {
                             </Select>
                         </div>
 
-                        {/* Location Select — FIXED: value/onChange */}
+                        {/* Location Select */}
                         <div className="w-48">
                             <Select
                                 className="w-full"
@@ -273,9 +381,6 @@ const CompaniesClient = ({ initialCompanies }) => {
                                                             {company.name}
                                                         </h2>
                                                     </Link>
-                                                    {/* <span className={`text-xs px-2.5 py-1 rounded-full border inline-flex items-center gap-1.5 ${statusBadge.color}`}>
-                                                        {statusBadge.label}
-                                                    </span> */}
                                                 </div>
                                                 <div className="flex items-center gap-3 mt-1 flex-wrap">
                                                     <div className="flex items-center gap-1">
