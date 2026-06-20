@@ -6,7 +6,7 @@ import PricingSection from "@/components/homepage/Pricing";
 // import Stats from "@/components/homepage/Stats";
 
 // import {ThemeSwitch} from "@/components/shared/ThemeSwitcher"
-export default function Home() {
+export default async function Home() {
   return (
     <div>
       <Hero/>

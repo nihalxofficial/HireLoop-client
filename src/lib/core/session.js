@@ -1,3 +1,5 @@
+"use server"
+
 import { headers } from "next/headers";
 import { auth } from "../auth";
 import { redirect } from "next/navigation";
@@ -8,6 +10,13 @@ export const getUserSession = async () => {
   });
   return session?.user || null;
 };
+
+export const getToken = async()=>{
+  const token = await auth.api.getToken({
+    headers: await headers(),
+  });
+  return token ? token.token : {}
+}
 
 
 export const requireRole = async(role)=>{
