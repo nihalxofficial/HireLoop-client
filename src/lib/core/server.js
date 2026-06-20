@@ -2,10 +2,17 @@ import { getToken } from "./session";
 
 const Api = process.env.NEXT_PUBLIC_API;
 
-export const serverFetch = async (path) => {
-    const token = await getToken()
-    const res = await fetch(`${Api}${path}`, { cache: 'no-store' }, {
-        Authorization : `Bearer ${token}`
+export const serverFetch = async (path, requireAuth = false) => {
+    const headers = {};
+    
+    if (requireAuth) {
+        const token = await getToken();
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${Api}${path}`, {
+        cache: 'no-store',
+        headers
     });
     const data = await res.json();
     return data;

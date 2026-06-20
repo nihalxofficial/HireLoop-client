@@ -1,7 +1,6 @@
-// app/pricing/PricingClient.jsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Accordion } from "@heroui/react";
 import { 
   CheckCircle, 
@@ -22,10 +21,32 @@ import {
   Loader2
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "react-toastify";
 
 const PricingClient = ({ seekerPlans, recruiterPlans }) => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("seeker");
   const [loadingPlan, setLoadingPlan] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: session } = await authClient.getSession();
+        setIsAuthenticated(!!session);
+      } catch (error) {
+        console.error("Error checking auth:", error);
+        setIsAuthenticated(false);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
   const faqItems = [
     {
@@ -91,41 +112,32 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
     return icons[iconName] || <BriefcaseBusiness size={20} />;
   };
 
-  // Handle Stripe Checkout
-  const handleCheckout = async (plan) => {
-    setLoadingPlan(plan.name);
-    
-    try {
-      const response = await fetch("/api/checkout_sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          planId: plan.id || plan.name.toLowerCase(),
-          planName: plan.name,
-          price: plan.price,
-          currency: plan.currency,
-          interval: plan.interval,
-          type: activeTab,
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        console.error("Failed to create checkout session:", data.error);
-        alert("Something went wrong. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to initiate checkout. Please try again.");
-    } finally {
-      setLoadingPlan(null);
+  // Handle form submission with auth check
+  const handleFormSubmit = (e, plan) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      sessionStorage.setItem('selectedPlan', JSON.stringify({
+        plan: plan.name,
+        type: activeTab,
+        price: plan.price
+      }));
+      router.push('/auth/login?redirect=/pricing');
+      return;
     }
+    // If authenticated, form will submit normally
   };
+
+  // Loading state while checking auth
+  if (checkingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Loader2 size={48} className="text-violet-400 animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-20 pb-16">
@@ -146,6 +158,12 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
             Choose the perfect plan that fits your needs. Whether you&apos;re a job seeker
             or an employer, we have the right solution for you.
           </p>
+          {!isAuthenticated && (
+            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs">
+              <span>🔒</span>
+              Sign in to subscribe to any plan
+            </div>
+          )}
         </div>
 
         {/* Tab Toggle */}
@@ -233,7 +251,7 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
                   ))}
                 </div>
 
-                {/* Action Button */}
+                {/* Action Button - RESTORED ORIGINAL STRUCTURE */}
                 {plan.name === "Enterprise" && activeTab === "recruiter" ? (
                   <Link href="/contact">
                     <Button className="w-full border border-white/10 bg-white/5 text-white hover:bg-white/10 transition-all duration-300">
@@ -242,13 +260,18 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
                     </Button>
                   </Link>
                 ) : plan.price === 0 ? (
-                  <Link href="/auth/signup">
+                  <Link href={isAuthenticated ? "/dashboard" : "/auth/signup"}>
                     <Button className="w-full border border-white/10 bg-white/5 text-white hover:bg-white/10 transition-all duration-300">
-                      Get Started
+                      {isAuthenticated ? "Go to Dashboard" : "Get Started"}
                     </Button>
                   </Link>
                 ) : (
-                  <form action="/api/checkout_sessions" method="POST" className="w-full">
+                  <form 
+                    action="/api/checkout_sessions" 
+                    method="POST" 
+                    className="w-full"
+                    onSubmit={(e) => handleFormSubmit(e, plan)}
+                  >
                     <input type="hidden" name="planId" value={plan.id || plan.name.toLowerCase()} />
                     <input type="hidden" name="planName" value={plan.name} />
                     <input type="hidden" name="price" value={plan.price} />
@@ -265,7 +288,12 @@ const PricingClient = ({ seekerPlans, recruiterPlans }) => {
                       }`}
                       isLoading={loadingPlan === plan.name}
                     >
-                      {loadingPlan === plan.name ? "Processing..." : `Choose ${plan.name}`}
+                      {loadingPlan === plan.name 
+                        ? "Processing..." 
+                        : !isAuthenticated 
+                          ? "Sign in to Subscribe" 
+                          : `Choose ${plan.name}`
+                      }
                     </Button>
                   </form>
                 )}
