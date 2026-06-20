@@ -273,9 +273,9 @@ const CompaniesClient = ({ initialCompanies }) => {
                                                             {company.name}
                                                         </h2>
                                                     </Link>
-                                                    <span className={`text-xs px-2.5 py-1 rounded-full border inline-flex items-center gap-1.5 ${statusBadge.color}`}>
+                                                    {/* <span className={`text-xs px-2.5 py-1 rounded-full border inline-flex items-center gap-1.5 ${statusBadge.color}`}>
                                                         {statusBadge.label}
-                                                    </span>
+                                                    </span> */}
                                                 </div>
                                                 <div className="flex items-center gap-3 mt-1 flex-wrap">
                                                     <div className="flex items-center gap-1">
